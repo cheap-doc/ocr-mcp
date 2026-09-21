@@ -1,0 +1,290 @@
+# doc.cheap MCP server — passport, ID card and MRZ OCR for AI agents
+
+Give your assistant a passport, national ID card or driver's licence and get the
+printed fields back as structured JSON — **$0.01 per recognised document**, with
+10 free recognitions before you register.
+
+An [MCP](https://modelcontextprotocol.io) server over stdio, for Claude Desktop,
+Claude Code, Cursor, VS Code, Gemini CLI, Windsurf, Kiro and any other MCP
+client. It is a thin client of the public doc.cheap HTTP API and a copy of the
+documentation: it holds no data of its own.
+
+```
+npx -y @doc-cheap/mcp
+```
+
+## Install
+
+Set `DOC_CHEAP_API_KEY` to your key. Leave it out and the server uses the public
+sandbox key, which runs 10 free recognitions and has no balance.
+
+### Claude Desktop
+
+`claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "doc-cheap": {
+      "command": "npx",
+      "args": ["-y", "@doc-cheap/mcp"],
+      "env": { "DOC_CHEAP_API_KEY": "sk_live_your_key" }
+    }
+  }
+}
+```
+
+### Claude Code
+
+```bash
+claude mcp add-json doc-cheap '{"command":"npx","args":["-y","@doc-cheap/mcp"],"env":{"DOC_CHEAP_API_KEY":"sk_live_your_key"}}'
+```
+
+### Cursor
+
+`~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project):
+
+```json
+{
+  "mcpServers": {
+    "doc-cheap": {
+      "command": "npx",
+      "args": ["-y", "@doc-cheap/mcp"],
+      "env": { "DOC_CHEAP_API_KEY": "sk_live_your_key" }
+    }
+  }
+}
+```
+
+### VS Code
+
+```bash
+code --add-mcp '{"name":"doc-cheap","command":"npx","args":["-y","@doc-cheap/mcp"]}'
+```
+
+Or `.vscode/mcp.json`, which nests servers under `servers` rather than
+`mcpServers`:
+
+```json
+{
+  "servers": {
+    "doc-cheap": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@doc-cheap/mcp"],
+      "env": { "DOC_CHEAP_API_KEY": "sk_live_your_key" }
+    }
+  }
+}
+```
+
+### Gemini CLI
+
+`~/.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "doc-cheap": {
+      "command": "npx",
+      "args": ["-y", "@doc-cheap/mcp"],
+      "env": { "DOC_CHEAP_API_KEY": "$DOC_CHEAP_API_KEY" }
+    }
+  }
+}
+```
+
+The repository also carries `gemini-extension.json`, so it installs as a Gemini
+CLI extension without writing settings by hand.
+
+### Windsurf
+
+`~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "doc-cheap": {
+      "command": "npx",
+      "args": ["-y", "@doc-cheap/mcp"],
+      "env": { "DOC_CHEAP_API_KEY": "${DOC_CHEAP_API_KEY}" }
+    }
+  }
+}
+```
+
+### Kiro
+
+`.kiro/settings/mcp.json` in the workspace, or `~/.kiro/settings/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "doc-cheap": {
+      "command": "npx",
+      "args": ["-y", "@doc-cheap/mcp"],
+      "env": { "DOC_CHEAP_API_KEY": "${DOC_CHEAP_API_KEY}" },
+      "disabled": false,
+      "autoApprove": ["check_balance", "search_docs"]
+    }
+  }
+}
+```
+
+Kiro also installs from a one-click link, which writes that block for you —
+it asks for confirmation first and shows the command and argument list it is
+about to add:
+
+```
+https://kiro.dev/launch/mcp/add?name=doc-cheap&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40doc-cheap%2Fmcp%22%5D%2C%22disabled%22%3Afalse%7D
+```
+
+(`config` is the URL-encoded JSON of
+`{"command":"npx","args":["-y","@doc-cheap/mcp"],"disabled":false}`.)
+
+### Claude Code plugin
+
+The repository carries `.claude-plugin/plugin.json`, so it installs as a Claude
+Code plugin rather than as a hand-written server entry.
+
+Every client starts the server as a process, so an edited configuration takes
+effect on the client's next launch.
+
+## Tools
+
+| Tool | Title | Read-only | Reaches the network |
+|---|---|---|---|
+| `scan_document` | Recognise a passport or ID document | no | yes |
+| `check_balance` | Check remaining credits | yes | yes |
+| `search_docs` | Search the doc.cheap API documentation | yes | no |
+
+### `scan_document`
+
+Recognise a passport, national ID card or driver's licence and return what is
+printed on it. Give it the image as `image_base64`, `image_path` or `image_url`,
+plus the optional `expect_country`, `return_portrait`, `retain_hours`,
+`reference` and `idempotency_key`.
+
+```json
+{
+  "image_base64": "/9j/4AAQSkZJRgABAQ…",
+  "expect_country": "GRC",
+  "idempotency_key": "order-4711-front"
+}
+```
+
+It answers with the whole `Scan` as structured JSON — `meta` (id, status,
+`billed`, confidence, timing), `document` (kind, issuing country, expiry),
+`holder` (names, dates, document numbers), `fields` (every extracted field with
+its own confidence), `mrz` (the parsed machine-readable zone and whether its
+check digits pass), `images`, `quality` and `authenticity` — and a one-line
+summary of the same result:
+
+```text
+Scan 01a0af18-cd8d-7a61-9f2d-4c7b8e105da3 · recognized · passport (GRC) · PARADEIGMA ELENI SOFIA · billed · 684 ms
+```
+
+One recognised document costs one credit, $0.01. An unreadable image, an empty
+frame or an unsupported type costs nothing, and `meta.billed` says which
+happened. Sending the same `idempotency_key` again returns the first result
+rather than recognising and charging a second time.
+
+### `check_balance`
+
+No arguments. Returns the balance, the credits spent and this period's scan
+counters by status. With the public sandbox key there is no account behind the
+call, so it says that instead of reporting zeros that read like a balance.
+
+```text
+Balance: 1840 credits · 63 scans this period (58 billed, 58 credits spent).
+```
+
+### `search_docs`
+
+```json
+{ "query": "mrz check digit", "limit": 5 }
+```
+
+Full-text search over the documentation — endpoints, response fields, error
+codes, MRZ rules, retention, pricing — returning the matching sections with
+titles, snippets and links. It reads a copy shipped inside this package, so it
+makes no network call.
+
+## Configuration
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `DOC_CHEAP_API_KEY` | `sk_sandbox_public` | Your API key. Unset uses the public sandbox: 10 free recognitions, no balance. |
+| `DOC_CHEAP_API_BASE` | `https://api.doc.cheap` | Base URL of the API. Only set this to reach another deployment. |
+| `DOC_CHEAP_DOCS_BASE` | `https://doc.cheap/docs` | Base URL used to build documentation links. |
+| `DOC_CHEAP_DOCS_DIR` | the copy inside the package | Override the directory `search_docs` reads. |
+| `DOC_CHEAP_IMAGE_ROOT` | unset (`image_path` disabled) | The one directory `image_path` may read images from. |
+| `DOC_CHEAP_SENTRY_DSN` | unset (nothing is reported) | Opt in to failure reporting. Without it the tracker library is never loaded. |
+
+## Image sources
+
+The server runs on your machine, with your files and your network, and the
+arguments to `scan_document` are chosen by a model. So the two sources that are
+not the image itself are fenced in:
+
+- **`image_path`** is **disabled until you set `DOC_CHEAP_IMAGE_ROOT`** to a
+  directory of your choosing. With it set, only files inside that directory can
+  be read: both the directory and the requested file are resolved to their real
+  locations first, so `..` segments and symlinks pointing out of the directory
+  are refused rather than followed. A relative `image_path` is taken from that
+  directory. Without the variable the tool answers with an error telling the
+  agent to set it or to send `image_base64`.
+- **`image_url`** must be `https:` and must resolve to a public internet
+  address. Loopback, private, link-local (including the cloud metadata
+  address), carrier-grade NAT, multicast, reserved and IPv6 unique-local and
+  link-local addresses are refused, as are the IPv4-mapped IPv6 spellings of
+  them. Redirects are followed by hand, at most three hops, and every hop is
+  re-checked, so a public URL cannot hand off to a private one. The body is
+  capped at 25 MB — the API refuses more anyway.
+- **`image_base64`** has no such constraints: the caller already holds the
+  bytes. It is the fallback every refusal above points at.
+
+A guard refusal is a normal tool error with a readable message, so the agent can
+tell you what to change.
+
+## Privacy
+
+Uploaded images are never stored. They live in memory for the length of the
+request and are gone when it ends. A **result** is kept for the window the call
+asked for in `retain_hours` — `0` stores nothing — or, when it asked for none,
+for the account's own history-retention setting. Nothing this server does is
+reported anywhere unless you set `DOC_CHEAP_SENTRY_DSN` yourself.
+
+## Run it from source
+
+```json
+{
+  "mcpServers": {
+    "doc-cheap": {
+      "command": "node",
+      "args": ["/absolute/path/to/the/checkout/apps/mcp/src/index.ts"],
+      "env": { "DOC_CHEAP_API_BASE": "http://127.0.0.1:3000" }
+    }
+  }
+}
+```
+
+`pnpm --filter @doc-cheap/mcp build` bundles the server to `build/index.js` with
+a shebang and copies the documentation content next to it, so the `bin`
+(`doc-cheap-mcp`) runs standalone.
+
+## Licence
+
+MIT — see [LICENSE](https://github.com/cheap-doc/ocr-mcp/blob/main/LICENSE). The monorepo this server is developed in is
+UNLICENSED; this package alone is published, and it is published under MIT.
+
+## Links
+
+- Guide: <https://doc.cheap/docs/guides/use-the-mcp-server>
+- Documentation: <https://doc.cheap/docs>
+- Get an API key: <https://doc.cheap/register>
+- Package: <https://www.npmjs.com/package/@doc-cheap/mcp>
+- Source and issues: <https://github.com/cheap-doc/ocr-mcp>
+- doc.cheap: <https://doc.cheap>
+
+In the MCP registry this server is `cheap.doc/mcp`.

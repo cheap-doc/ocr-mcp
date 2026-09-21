@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "cheap.doc/mcp",
+  "description": "Passport, ID and MRZ recognition through the doc.cheap API — $0.01 per document",
+  "version": "0.1.0",
+  "websiteUrl": "https://doc.cheap/docs/guides/use-the-mcp-server",
+  "repository": {
+    "url": "https://github.com/cheap-doc/ocr-mcp",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@doc-cheap/mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "DOC_CHEAP_API_KEY",
+          "description": "Your doc.cheap API key. Left unset, the server calls the public sandbox key, which runs 10 free recognitions and has no balance.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "DOC_CHEAP_API_BASE",
+          "description": "Base URL of the doc.cheap API. Only set this to reach a different deployment.",
+          "isRequired": false,
+          "isSecret": false,
+          "default": "https://api.doc.cheap"
+        }
+      ]
+    }
+  ]
+}

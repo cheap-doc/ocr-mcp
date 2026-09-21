@@ -1,0 +1,10 @@
+{
+  "/api-reference": "/reference/api",
+  "/quickstart": "/start/first-recognition",
+  "/pricing": "/concepts/what-a-billed-scan-is",
+  "/status": "/reference/service-levels",
+  "/errors": "/reference/errors",
+  "/reference/response-v1": "/reference/response",
+  "/reference/response-v2": "/reference/response",
+  "/guides/read-the-v2-result": "/reference/response"
+}

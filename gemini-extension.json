@@ -1,0 +1,14 @@
+{
+  "name": "doc-cheap",
+  "version": "0.1.0",
+  "mcpServers": {
+    "doc-cheap": {
+      "command": "npx",
+      "args": ["-y", "@doc-cheap/mcp"],
+      "env": {
+        "DOC_CHEAP_API_KEY": "$DOC_CHEAP_API_KEY"
+      }
+    }
+  },
+  "contextFileName": "README.md"
+}
