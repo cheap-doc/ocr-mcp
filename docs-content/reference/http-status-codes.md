@@ -29,7 +29,7 @@ what a proxy, a load balancer and a metrics dashboard read.
 | 404 | [`not_found`](/errors/not_found) | No |
 | 409 | [`idempotency_conflict`](/errors/idempotency_conflict), [`idempotency_in_progress`](/errors/idempotency_in_progress), [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable), [`topup_in_progress`](/errors/topup_in_progress) | Depends on the code |
 | 413 | [`payload_too_large`](/errors/payload_too_large) | No, until the image is smaller |
-| 415 | [`unsupported_media_type`](/errors/unsupported_media_type) | No, until the header changes |
+| 415 | [`unsupported_media_type`](/errors/unsupported_media_type) | No, until the header or the image format changes |
 | 422 | [`validation_failed`](/errors/validation_failed) | No, until the field is fixed |
 | 429 | [`rate_limited`](/errors/rate_limited), [`document_repeated`](/errors/document_repeated) | After the window |
 | 500 | [`internal_error`](/errors/internal_error) | Once |

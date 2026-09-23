@@ -1,5 +1,6 @@
 import { lookup as dnsLookup } from "node:dns/promises";
 import { readFile, realpath } from "node:fs/promises";
+import { detectImageFormat, IMAGE_SIGNATURE_BYTES, SUPPORTED_IMAGE_FORMATS } from "./vendor/contracts/image-format.ts";
 // Every throw below is a message for the caller to act on — a missing source, a
 // body over the ceiling, a server that answered badly — so all of them carry the
 // expected-failure marker and none of them becomes a report.
@@ -119,6 +120,23 @@ export async function fetchImageBytes(
   throw new ExpectedFailure(`image_url redirected more than ${MAX_REDIRECTS} times; giving up.`);
 }
 
+// Enough base64 characters to cover the bytes the format check reads, with room
+// for the line breaks some encoders insert, which decoding skips.
+const SIGNATURE_BASE64_CHARS = Math.ceil(IMAGE_SIGNATURE_BYTES / 3) * 4 * 2;
+
+// The API reads JPEG and PNG and refuses anything else; checking here answers
+// the caller before an upload of bytes that could only be refused, and in words
+// that name the input they chose.
+function assertSupportedImage(base64: string, source: string): string {
+  const head = Buffer.from(base64.slice(0, SIGNATURE_BASE64_CHARS), "base64");
+  if (detectImageFormat(head) === null) {
+    throw new ExpectedFailure(
+      `${source} is not a ${SUPPORTED_IMAGE_FORMATS} image. Send a photo or scan of the document as ${SUPPORTED_IMAGE_FORMATS}.`,
+    );
+  }
+  return base64;
+}
+
 /**
  * Turns whichever image field the caller gave into base64. Exactly one source
  * is used, in priority order; a missing source is a clear tool error.
@@ -131,9 +149,11 @@ export async function fetchImageBytes(
  */
 export async function resolveImage(
   input: ImageInput,
-  options: { readonly allowPath?: boolean } = {},
+  options: { readonly allowPath?: boolean; readonly fetchDeps?: ImageFetchDeps } = {},
 ): Promise<string> {
-  if (input.image_base64) return stripDataUrl(input.image_base64);
+  if (input.image_base64) {
+    return assertSupportedImage(stripDataUrl(input.image_base64), "image_base64");
+  }
   if (input.image_path) {
     // The hosted server has no files of the caller's to read, and the files it
     // does have are not the caller's business.
@@ -148,11 +168,11 @@ export async function resolveImage(
       realpath,
     );
     const bytes = await readFile(path);
-    return bytes.toString("base64");
+    return assertSupportedImage(bytes.toString("base64"), "image_path");
   }
   if (input.image_url) {
-    const bytes = await fetchImageBytes(input.image_url);
-    return bytes.toString("base64");
+    const bytes = await fetchImageBytes(input.image_url, options.fetchDeps);
+    return assertSupportedImage(bytes.toString("base64"), "image_url");
   }
   throw new ExpectedFailure(
     options.allowPath === false

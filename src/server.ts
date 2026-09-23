@@ -1,8 +1,9 @@
-import { type ScanOptionsInput } from "./vendor/contracts/reading.ts";
+import { type ScanOptionsInput, ScanStatus } from "./vendor/contracts/reading.ts";
 import { Scan } from "./vendor/contracts/scan.ts";
 import { Usage } from "./vendor/contracts/usage.ts";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { SANDBOX_ALLOWANCE } from "./allowance.ts";
 import { type CallContext, createApiClient } from "./api-client.ts";
 import type { McpConfig } from "./config.ts";
 import { searchDocs } from "./docs-search.ts";
@@ -68,6 +69,29 @@ const SearchOutput = z.object({
     )
     .describe("Matching sections, best first; empty when nothing matched."),
 });
+
+// What the public sandbox key's usage is, without asking the API. The key has no
+// account behind it, so the API's own answer is always this — a null balance
+// and zero counters over the current UTC calendar month — and asking for it
+// cost the caller one of the few requests an hour the sandbox key allows, the
+// same ones a scan needs.
+export function sandboxUsage(now: Date): Usage {
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+  return {
+    balance_credits: null,
+    period: { start: start.toISOString(), end: end.toISOString() },
+    scans: {
+      total: 0,
+      billed: 0,
+      by_status: Object.fromEntries(ScanStatus.options.map((status) => [status, 0])) as Record<
+        ScanStatus,
+        number
+      >,
+    },
+    credits_spent: 0,
+  };
+}
 
 function textContent(text: string): { type: "text"; text: string } {
   return { type: "text", text };
@@ -185,7 +209,9 @@ export function buildServer(
         "result. Calls POST /v1/scans. " +
         "Cost: it bills one credit ($0.01) only when a document is recognised; an unreadable " +
         "image, an empty frame or an unsupported type costs nothing, and meta.billed says " +
-        "which happened. The public sandbox key gives 10 free recognitions. " +
+        "which happened. " +
+        SANDBOX_ALLOWANCE +
+        " " +
         "Use it whenever someone hands over an identity document and wants it read, " +
         "transcribed, or checked against what they claim — a name, a document number, a date " +
         "of birth or an expiry date.",
@@ -304,7 +330,8 @@ export function buildServer(
         "Return how many credits are left on the account and what the current period has " +
         "used: the balance, the credits spent, and the scan counters broken down by status " +
         "(recognized, unreadable, no document found, unsupported document, rejected). " +
-        "Takes no arguments and calls GET /v1/usage. " +
+        "Takes no arguments and calls GET /v1/usage; under the public sandbox key it answers " +
+        "without calling anything. " +
         "One recognised document draws one credit, at $0.01; scans that recognised nothing " +
         "are counted and never charged. " +
         "Needs a real API key — under the public sandbox key there is no account behind the " +
@@ -328,20 +355,25 @@ export function buildServer(
     },
     async (_args, extra) => {
       try {
-        const usage = UsageOutput.parse(await api.getUsage(callContext(extra)));
-        // Under the public sandbox key the API answers with its own standing —
-        // a null balance and the key's counters — which is well-formed but is
-        // nobody's account. The first line says so, and says how to get one, so
-        // a model does not read the counters as the caller's own.
+        // Under the public sandbox key there is nobody's account to read, so
+        // the answer is built here rather than fetched (see `sandboxUsage`).
+        // The first line says so, and says how to get one, so a model does not
+        // read the zeros as the caller's own.
+        const usage = UsageOutput.parse(
+          config.usingSandboxKey
+            ? sandboxUsage(new Date())
+            : await api.getUsage(callContext(extra)),
+        );
         const headline = !config.usingSandboxKey
           ? summarizeUsage(usage)
           : remote
             ? "No API key was sent, so the public demo sandbox key is in use and has no " +
-              "balance. Register for a key and send it as `Authorization: Bearer <key>` to " +
-              "check your balance and usage."
+              `balance. ${SANDBOX_ALLOWANCE} Register for a key and send it as ` +
+              "`X-Doc-Cheap-Api-Key: <key>` or `Authorization: Bearer <key>` to check your " +
+              "balance and usage."
             : "No API key is configured, so the public demo sandbox key is in use and has no " +
-              "balance. Register for a key and set DOC_CHEAP_API_KEY to check your balance and " +
-              "usage.";
+              `balance. ${SANDBOX_ALLOWANCE} Register for a key and set DOC_CHEAP_API_KEY to ` +
+              "check your balance and usage.";
         return {
           structuredContent: usage as unknown as Record<string, unknown>,
           content: [textContent(headline), textContent(JSON.stringify(usage, null, 2))],

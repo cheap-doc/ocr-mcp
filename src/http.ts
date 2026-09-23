@@ -10,12 +10,13 @@
 //
 // What the caller controls, and how each of those is bounded here:
 //
-// - the API key, optional, in `Authorization: Bearer …` or `X-Doc-Cheap-Api-Key`.
+// - the API key, optional, in `X-Doc-Cheap-Api-Key` or `Authorization: Bearer …`.
 //   Without one the public sandbox key stands in, exactly as it does for the
 //   package run locally with no configuration. The key is handed to the API
 //   and nowhere else: it is never logged and never part of an event.
 // - the request body, capped before it is parsed, so a hostile caller cannot
-//   grow this process by sending more.
+//   grow this process by sending more; and the bytes held for every request in
+//   progress together, so many callers at once cannot either.
 // - the request rate, one fixed window per client address, in front of the
 //   API's own limits rather than instead of them.
 //
@@ -28,7 +29,7 @@
 import { randomUUID } from "node:crypto";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { isIP } from "node:net";
-import { SANDBOX_PUBLIC_KEY } from "./vendor/contracts/headers.ts";
+import { ApiKey, SANDBOX_PUBLIC_KEY } from "./vendor/contracts/headers.ts";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import type { McpConfig } from "./config.ts";
@@ -61,13 +62,27 @@ export const RATE_LIMIT_WINDOW_MS = 60_000;
 // images; past it a caller is told to come back rather than queued.
 export const MAX_IN_FLIGHT = 64;
 
+// The bytes all requests in progress may hold between them, counted as they
+// arrive, plus the image an `image_url` call may fetch. The cap on requests in
+// flight alone does not bound memory: 64 bodies of 36 MiB are well over the
+// container's 1 GiB, and each body is held several times over while it is
+// parsed, re-encoded and sent on to the API. This budget keeps the worst case a
+// fraction of the container, and a caller past it is told to come back.
+export const MAX_IN_FLIGHT_BYTES = 128 * 1024 * 1024;
+
+// What an `image_url` call is charged against that budget before it runs: the
+// largest image it may fetch, since how large it is cannot be known in advance.
+export const IMAGE_URL_RESERVATION_BYTES = 25 * 1024 * 1024;
+
 // How long one request may take end to end. The edge in front gives an origin
 // about a hundred seconds before it answers for it, so the server gives up
 // first and says why.
 export const REQUEST_TIMEOUT_MS = 90_000;
 
-// The one header an API key may also arrive in, for clients whose configuration
-// has room for a named header but reserves `Authorization` for its own use.
+// The header an API key arrives in for clients whose configuration has room for
+// a named header but reserves `Authorization` for its own use — a directory's
+// proxy that authenticates its users with a token of its own is one. It wins
+// over `Authorization` whenever both are sent.
 export const API_KEY_HEADER = "x-doc-cheap-api-key";
 
 // What a key is allowed to look like before it is put into an outbound header.
@@ -100,21 +115,54 @@ function headerValue(headers: IncomingMessage["headers"], name: string): string 
   return trimmed === undefined || trimmed === "" ? undefined : trimmed;
 }
 
-/** The caller's API key, if one was sent, from either header that may carry it. */
+/**
+ * The caller's API key, if one was sent.
+ *
+ * The named header is this server's own, so whatever it carries is meant as a
+ * doc.cheap key, and it wins. `Authorization` is shared with everything between
+ * the caller and here: it is read only when it is `Bearer` with a doc.cheap key
+ * in it. Any other credential there — another scheme, or a bearer token that is
+ * not one of ours — belongs to somebody else and is never forwarded to the API;
+ * the call goes on as if no key was sent. A bearer value that starts like one of
+ * ours but is not well-formed is refused, since it was plainly meant as a key.
+ */
 export function readApiKey(headers: IncomingMessage["headers"]): KeyReading {
-  const authorization = headerValue(headers, "authorization");
   const named = headerValue(headers, API_KEY_HEADER);
-  let candidate: string | undefined;
-  if (authorization !== undefined) {
-    const match = /^Bearer\s+(\S+)$/i.exec(authorization);
-    if (match === null) return { kind: "malformed" };
-    candidate = match[1];
-  } else {
-    candidate = named;
+  if (named !== undefined) {
+    return KEY_SHAPE.test(named) ? { kind: "key", key: named } : { kind: "malformed" };
   }
-  if (candidate === undefined) return { kind: "none" };
-  if (!KEY_SHAPE.test(candidate)) return { kind: "malformed" };
-  return { kind: "key", key: candidate };
+  const authorization = headerValue(headers, "authorization");
+  if (authorization === undefined) return { kind: "none" };
+  const bearer = /^Bearer\s+(\S+)$/i.exec(authorization)?.[1];
+  if (bearer === undefined) return { kind: "none" };
+  if (ApiKey.safeParse(bearer).success) return { kind: "key", key: bearer };
+  return bearer.startsWith("sk_") ? { kind: "malformed" } : { kind: "none" };
+}
+
+/** A shared allowance of bytes, taken before they are held and given back after. */
+export interface ByteBudget {
+  /** Takes `bytes` from the budget; false, and nothing taken, when they do not fit. */
+  take(bytes: number): boolean;
+  give(bytes: number): void;
+  /** Bytes currently taken, for tests and diagnostics. */
+  readonly inUse: number;
+}
+
+export function createByteBudget(limit: number): ByteBudget {
+  let inUse = 0;
+  return {
+    take(bytes) {
+      if (inUse + bytes > limit) return false;
+      inUse += bytes;
+      return true;
+    },
+    give(bytes) {
+      inUse = Math.max(0, inUse - bytes);
+    },
+    get inUse() {
+      return inUse;
+    },
+  };
 }
 
 /**
@@ -195,23 +243,71 @@ export interface HttpServerOptions {
   readonly limiter?: WindowLimiter;
   readonly maxRequestBytes?: number;
   readonly maxInFlight?: number;
+  readonly maxInFlightBytes?: number;
   readonly requestTimeoutMs?: number;
 }
 
 class BodyTooLarge extends Error {}
+class OverBudget extends Error {}
+class ClientGone extends Error {}
 
-async function readBody(request: IncomingMessage, limit: number): Promise<Buffer> {
+// Reads the body, taking each chunk from the shared budget before keeping it.
+// `charge` is what this request has taken so far, so the caller can give back
+// exactly that however the read ends.
+async function readBody(
+  request: IncomingMessage,
+  limit: number,
+  budget: ByteBudget,
+  charge: { bytes: number },
+): Promise<Buffer> {
   const declared = Number(request.headers["content-length"]);
   if (Number.isFinite(declared) && declared > limit) throw new BodyTooLarge();
+  // A declared length is taken whole, up front, so a request that cannot fit
+  // is turned away before its first byte is read rather than half-way through.
+  if (Number.isFinite(declared) && declared > 0) {
+    if (!budget.take(declared)) throw new OverBudget();
+    charge.bytes += declared;
+  }
   const chunks: Buffer[] = [];
   let total = 0;
-  for await (const chunk of request) {
-    const buffer = chunk as Buffer;
-    total += buffer.byteLength;
-    if (total > limit) throw new BodyTooLarge();
-    chunks.push(buffer);
+  try {
+    for await (const chunk of request) {
+      const buffer = chunk as Buffer;
+      total += buffer.byteLength;
+      if (total > limit) throw new BodyTooLarge();
+      if (total > charge.bytes) {
+        const more = total - charge.bytes;
+        if (!budget.take(more)) throw new OverBudget();
+        charge.bytes += more;
+      }
+      chunks.push(buffer);
+    }
+  } catch (error) {
+    // The caller hung up mid-upload. That is theirs to do, not a fault here:
+    // there is nobody left to answer and nothing to report.
+    if (request.destroyed && !(error instanceof BodyTooLarge || error instanceof OverBudget)) {
+      throw new ClientGone();
+    }
+    throw error;
   }
   return Buffer.concat(chunks);
+}
+
+// Whether the message is a scan that will fetch its image from a URL, which
+// holds up to a whole image in memory beyond the body that asked for it.
+function fetchesImageUrl(body: unknown): boolean {
+  const messages = Array.isArray(body) ? body : [body];
+  return messages.some((message) => {
+    if (typeof message !== "object" || message === null) return false;
+    const call = message as { method?: unknown; params?: { arguments?: unknown } };
+    if (call.method !== "tools/call") return false;
+    const args = call.params?.arguments;
+    return (
+      typeof args === "object" &&
+      args !== null &&
+      typeof (args as { image_url?: unknown }).image_url === "string"
+    );
+  });
 }
 
 function sendJson(
@@ -263,6 +359,7 @@ export function createMcpHttpServer(options: HttpServerOptions): Server {
     createWindowLimiter({ limit: RATE_LIMIT_PER_WINDOW, windowMs: RATE_LIMIT_WINDOW_MS });
   const maxRequestBytes = options.maxRequestBytes ?? MAX_REQUEST_BYTES;
   const maxInFlight = options.maxInFlight ?? MAX_IN_FLIGHT;
+  const budget = createByteBudget(options.maxInFlightBytes ?? MAX_IN_FLIGHT_BYTES);
   let inFlight = 0;
 
   async function handleMcp(
@@ -286,7 +383,7 @@ export function createMcpHttpServer(options: HttpServerOptions): Server {
         response,
         400,
         -32000,
-        "The API key header is not in a usable form: send `Authorization: Bearer <your key>`, or no key at all to use the public sandbox key.",
+        `The API key header is not in a usable form: send your doc.cheap key as \`X-Doc-Cheap-Api-Key: <your key>\` or \`Authorization: Bearer <your key>\`, or no key at all to use the public sandbox key.`,
       );
       finish({ reason: "malformed_key" });
       return;
@@ -301,11 +398,29 @@ export function createMcpHttpServer(options: HttpServerOptions): Server {
     }
 
     inFlight += 1;
+    const charge = { bytes: 0 };
+    const busy = (): void => {
+      sendRpcError(response, 503, -32000, "The server is busy; retry shortly.", {
+        "retry-after": "5",
+      });
+      finish({ reason: "busy_bytes" });
+    };
     try {
       let raw: Buffer;
       try {
-        raw = await readBody(request, maxRequestBytes);
+        raw = await readBody(request, maxRequestBytes, budget, charge);
       } catch (error) {
+        if (error instanceof ClientGone) {
+          // Logged under the status nginx gives the same event, 499, so the
+          // line is not read as an answer the caller received.
+          response.statusCode = 499;
+          finish({ reason: "client_closed" });
+          return;
+        }
+        if (error instanceof OverBudget) {
+          busy();
+          return;
+        }
         if (error instanceof BodyTooLarge) {
           sendRpcError(
             response,
@@ -326,6 +441,14 @@ export function createMcpHttpServer(options: HttpServerOptions): Server {
         sendRpcError(response, 400, -32700, "Parse error: the body is not JSON.");
         finish({ reason: "parse_error" });
         return;
+      }
+
+      if (fetchesImageUrl(body)) {
+        if (!budget.take(IMAGE_URL_RESERVATION_BYTES)) {
+          busy();
+          return;
+        }
+        charge.bytes += IMAGE_URL_RESERVATION_BYTES;
       }
 
       const own = key.kind === "key" && key.key !== SANDBOX_PUBLIC_KEY;
@@ -354,6 +477,7 @@ export function createMcpHttpServer(options: HttpServerOptions): Server {
       finish({ ...describeRpc(body), key: own ? "own" : "sandbox" });
     } finally {
       inFlight -= 1;
+      budget.give(charge.bytes);
     }
   }
 
