@@ -27,9 +27,14 @@ await build({
   // distribution.test.ts holds the two in step.
   target: "node20",
   banner: { js: "#!/usr/bin/env node" },
-  // The runtime dependencies resolve from node_modules at run time; the
-  // workspace-only contracts and observability packages are bundled in (they
-  // are never published).
+  // The runtime dependencies resolve from node_modules at run time, so each one
+  // is also a `dependencies` entry in package.json; the workspace-only
+  // contracts and observability packages are bundled in instead, because they
+  // are never published and npm could not install them. Those two are
+  // devDependencies for exactly that reason — npm publishes `dependencies`
+  // verbatim, so a workspace-only specifier left there reaches the registry and
+  // breaks every install off it, before a line of this server runs.
+  // distribution.test.ts holds this list and that split in step.
   //
   // The tracker SDK is external for a second reason beyond size: the reporter
   // reaches it with a dynamic import so that a run without a DSN — the normal

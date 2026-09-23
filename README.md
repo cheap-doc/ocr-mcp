@@ -255,7 +255,7 @@ When it calls the doc.cheap API it identifies itself in the request's
 `User-Agent`, the way any HTTP client does:
 
 ```
-doc-cheap-mcp/0.1.1 (claude-code/1.4.2)
+doc-cheap-mcp/0.1.2 (claude-code/1.4.2)
 ```
 
 The first half is this package and its version. The second half is **the name
@@ -267,7 +267,7 @@ actually are. It is never used to change what the server does, and nothing else
 about you, your prompts, your files or your images travels with it.
 
 **Switching it off:** set `DO_NOT_TRACK=1` in the server's environment. The
-request then carries `doc-cheap-mcp/0.1.1` and nothing more — no client name, no
+request then carries `doc-cheap-mcp/0.1.2` and nothing more — no client name, no
 client version, no `baggage` header — and everything else works identically.
 
 Your API key already identifies your account to the API; that is what a key is

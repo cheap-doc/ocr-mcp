@@ -1,0 +1,73 @@
+# Publishes @doc-cheap/mcp to npm.
+#
+# This repository is the generated public mirror of one package; the server is
+# developed elsewhere and every file here except this one is written by the
+# sync script. The pipeline exists here rather than beside the sources because
+# npm's trusted publishing accepts an OIDC token only from GitLab.com's own
+# instance runners and only from a public project, and the development
+# repository is private and builds on a self-hosted runner.
+#
+# No credential is stored anywhere: GitLab mints the two ID tokens below, npm
+# exchanges the first for a publish credential that lives for the length of the
+# call, and signs a provenance attestation with the second.
+
+default:
+  image: node:24-alpine
+
+stages:
+  - verify
+  - publish
+
+# The steps a release runs, minus the publish itself. Cutting a tag against a
+# tree that cannot be built is the failure worth catching before the version
+# number is spent: a published version is immutable, so a bad one is not undone.
+verify:
+  stage: verify
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_PROJECT_PATH == "doccheap/ocr-mcp"
+  script:
+    - node --version
+    # No lockfile is committed: the tree is regenerated in full by the sync
+    # script, which would delete one. `npm ci` therefore has nothing to read.
+    - npm install
+    - npm run typecheck
+    - npm run build
+    - npm publish --dry-run --access public
+
+publish:
+  stage: publish
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v/ && $CI_PROJECT_PATH == "doccheap/ocr-mcp"
+  id_tokens:
+    NPM_ID_TOKEN:
+      aud: "npm:registry.npmjs.org"
+    SIGSTORE_ID_TOKEN:
+      aud: sigstore
+  # A publish that is cancelled mid-call can still have reached the registry.
+  interruptible: false
+  resource_group: npm-publish
+  before_script:
+    # Trusted publishing needs npm >= 11.5.1; the image is upgraded only when
+    # its own npm is older, so an ordinary release pays for no download.
+    - |
+      node -e 'const v=require("child_process").execSync("npm --version").toString().trim().split(".").map(Number);
+               process.exit((v[0]>11||(v[0]===11&&(v[1]>5||(v[1]===5&&v[2]>=1))))?0:1)' \
+        || npm install --global npm@latest
+    - node --version
+    - npm --version
+  script:
+    # The tag is what a human types; package.json is what npm publishes. They
+    # are compared here so a mistyped tag fails before the version is spent.
+    - |
+      version="$(node -p "require('./package.json').version")"
+      if [ "v$version" != "$CI_COMMIT_TAG" ]; then
+        echo "tag $CI_COMMIT_TAG does not match package.json $version" >&2
+        exit 1
+      fi
+    - npm install
+    - npm run build
+    # No --provenance flag: under trusted publishing npm attests automatically,
+    # and only for a public package out of a public repository, which this is.
+    - npm publish --access public
