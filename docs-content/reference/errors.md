@@ -67,7 +67,7 @@ These 17 are the API working. Each is a refusal with a reason, and each carries
 | 409 | [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) | The key's result is no longer there to replay |
 | 409 | [`topup_in_progress`](/errors/topup_in_progress) | A top-up for this asset is open and part-paid |
 | 413 | [`payload_too_large`](/errors/payload_too_large) | The body is over 36 MiB |
-| 415 | [`unsupported_media_type`](/errors/unsupported_media_type) | The body was not sent as JSON |
+| 415 | [`unsupported_media_type`](/errors/unsupported_media_type) | The body was not sent as JSON, or the image is not a JPEG or PNG |
 | 422 | [`validation_failed`](/errors/validation_failed) | A field failed the schema; the message names it |
 | 429 | [`document_repeated`](/errors/document_repeated) | The same image, too many times on the free sandbox |
 | 429 | [`rate_limited`](/errors/rate_limited) | Over the rate limit for this key kind |

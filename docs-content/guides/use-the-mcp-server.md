@@ -22,9 +22,11 @@ as a command. One recognized document costs one credit, $0.01.
 
 The same three tools are hosted at `https://mcp.doc.cheap/mcp` over Streamable
 HTTP, for a client that connects to a URL rather than launching a command. No
-login is needed. Send your key as `Authorization: Bearer sk_live_your_key`, or
-send none and the public sandbox key is used, with 10 free recognitions from
-your address.
+login is needed. Send your key as `X-Doc-Cheap-Api-Key: sk_live_your_key` or
+`Authorization: Bearer sk_live_your_key`. The named header wins when both are
+sent. That suits a client or proxy that uses `Authorization` for its own login.
+An `Authorization` that does not carry a doc.cheap key is ignored, never passed
+on. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits.
 
 The hosted server cannot read files on your machine, so `scan_document` takes
 the image as `image_base64` or `image_url` there.
@@ -53,8 +55,8 @@ Connectors, as a custom connector with that URL.
 ## Install it
 
 The package is `@doc-cheap/mcp`, and every client below starts it with `npx`.
-Set `DOC_CHEAP_API_KEY` to your key. Leave it out and the server uses the
-public sandbox key, which runs 10 free recognitions and has no balance.
+Set `DOC_CHEAP_API_KEY` to your key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits. The sandbox key has no
+balance.
 
 ### Claude Desktop, Cursor and Windsurf
 
@@ -147,8 +149,8 @@ Everything is optional, and every default is a working setting.
 | `DOC_CHEAP_IMAGE_ROOT` | Unset, which disables `image_path` | The one directory local images may be read from |
 | `DOC_CHEAP_SENTRY_DSN` | Unset, which reports nothing | Where failures are reported, if you want them reported |
 
-With no key set, the server uses the public sandbox key. That runs 10 free
-recognitions and has no balance to report.
+With no key set, the server uses the public sandbox key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits. It has no
+balance to report, so `check_balance` answers without calling the API.
 
 ## Use the three tools
 

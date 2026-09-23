@@ -1,8 +1,8 @@
 # doc.cheap MCP server — passport, ID card and MRZ OCR for AI agents
 
 Give your assistant a passport, national ID card or driver's licence and get the
-printed fields back as structured JSON — **$0.01 per recognised document**, with
-10 free recognitions before you register.
+printed fields back as structured JSON — **$0.01 per recognised document**, and
+free to try before you register. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits.
 
 An [MCP](https://modelcontextprotocol.io) server over stdio, for Claude Desktop,
 Claude Code, Cursor, VS Code, Gemini CLI, Windsurf, Kiro and any other MCP
@@ -17,8 +17,10 @@ npx -y @doc-cheap/mcp
 ## Hosted — nothing to install
 
 `https://mcp.doc.cheap/mcp` serves the same three tools over Streamable HTTP. No
-login: send your key as `Authorization: Bearer sk_live_your_key`, or send no key
-and the public sandbox key is used, 10 free recognitions from your address. The
+login: send your key as `X-Doc-Cheap-Api-Key: sk_live_your_key` or
+`Authorization: Bearer sk_live_your_key` — the named header wins when both are
+sent, and an `Authorization` that is not a doc.cheap key is ignored rather than
+passed on. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits. The
 hosted server cannot read files on your machine, so `scan_document` takes the
 image as `image_base64` or `image_url`; `image_path` is for the local server
 only.
@@ -69,8 +71,7 @@ VS Code, `.vscode/mcp.json` (the key is asked for once and stored by VS Code):
 
 ## Install locally
 
-Set `DOC_CHEAP_API_KEY` to your key. Leave it out and the server uses the public
-sandbox key, which runs 10 free recognitions and has no balance.
+Set `DOC_CHEAP_API_KEY` to your key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits. The sandbox key has no balance.
 
 ### Claude Desktop — one-click extension
 
@@ -309,7 +310,7 @@ looks one up by its path. Reading one makes no network call.
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `DOC_CHEAP_API_KEY` | `sk_sandbox_public` | Your API key. Unset uses the public sandbox: 10 free recognitions, no balance. |
+| `DOC_CHEAP_API_KEY` | `sk_sandbox_public` | Your API key. Unset uses the public sandbox key: 10 free recognised documents per address in all, at most 10 requests per address an hour, no balance. |
 | `DOC_CHEAP_API_BASE` | `https://api.doc.cheap` | Base URL of the API. Only set this to reach another deployment. |
 | `DOC_CHEAP_DOCS_BASE` | `https://doc.cheap/docs` | Base URL used to build documentation links. |
 | `DOC_CHEAP_DOCS_DIR` | the copy inside the package | Override the directory `search_docs` reads. |
@@ -349,7 +350,7 @@ When it calls the doc.cheap API it identifies itself in the request's
 `User-Agent`, the way any HTTP client does:
 
 ```
-doc-cheap-mcp/0.3.1 (claude-code/1.4.2)
+doc-cheap-mcp/0.3.2 (claude-code/1.4.2)
 ```
 
 The first half is this package and its version. The second half is **the name
@@ -361,7 +362,7 @@ actually are. It is never used to change what the server does, and nothing else
 about you, your prompts, your files or your images travels with it.
 
 **Switching it off:** set `DO_NOT_TRACK=1` in the server's environment. The
-request then carries `doc-cheap-mcp/0.3.1` and nothing more — no client name, no
+request then carries `doc-cheap-mcp/0.3.2` and nothing more — no client name, no
 client version, no `baggage` header — and everything else works identically.
 
 Your API key already identifies your account to the API; that is what a key is

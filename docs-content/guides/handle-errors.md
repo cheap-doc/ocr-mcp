@@ -117,7 +117,7 @@ at nothing.
 | [`idempotency_in_progress`](/errors/idempotency_in_progress) | 409 | Wait a moment, then retry the same request with the same key |
 | [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) | 409 | The first answer is gone. Send the request again under a new key |
 | [`payload_too_large`](/errors/payload_too_large) | 413 | Shrink the image. Retrying it unchanged fails again |
-| [`unsupported_media_type`](/errors/unsupported_media_type) | 415 | Send `Content-Type: application/json` |
+| [`unsupported_media_type`](/errors/unsupported_media_type) | 415 | Send `Content-Type: application/json`, and the image as JPEG or PNG |
 | [`rate_limited`](/errors/rate_limited) | 429 | Wait the `Retry-After` seconds, then retry the same request |
 | [`document_repeated`](/errors/document_repeated) | 429 | Wait the `Retry-After` seconds, or register. The same image went up too often on the free sandbox |
 | [`internal_error`](/errors/internal_error) | 500 | Retry once with backoff. Quote `event_id` if it keeps happening |

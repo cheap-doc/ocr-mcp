@@ -10,7 +10,8 @@ verified: 1.0.2
 
 # unsupported_media_type (415)
 
-The body was sent under a content type this API does not accept.
+The body was sent under a content type this API does not accept, or the image
+in it is not a format recognition reads.
 
 ## Cause
 
@@ -19,18 +20,31 @@ Every endpoint takes JSON. A request sent as `text/plain`,
 `Content-Type` at all is refused here, before the body is parsed.
 
 The image travels as a base64 string inside a JSON object, never as a file
-upload.
+upload. `POST /v1/scans` reads JPEG and PNG. A PDF, a HEIC photo, a text file
+or a file cut off after its first bytes is none of those. When the decoded
+bytes of `image` do not start like a JPEG or a PNG, the scan is refused here
+too, before recognition runs.
+Nothing is charged, and no free attempt of the sandbox key is spent.
 
 ## The message
+
+For the content type:
 
 ```text
 Send the request body as `Content-Type: application/json`.
 ```
 
+For the image:
+
+```text
+The image is not a JPEG or PNG file. Send the document photo as JPEG or PNG, base64-encoded in the `image` field.
+```
+
 ## The fix
 
 Send `Content-Type: application/json` and put the base64 image in the `image`
-field of the JSON body.
+field of the JSON body. Convert any other image format to JPEG before encoding
+it. The upload pages send quality 85 at about 1600 px on the long edge.
 
 ## event_id
 

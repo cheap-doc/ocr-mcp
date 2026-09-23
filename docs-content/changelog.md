@@ -11,6 +11,15 @@ section: Changelog
 Dated, public record of changes to the API and its documentation. The most
 recent change is first.
 
+## 2026-09-24 — 1.28.0, an image that is not one is refused
+
+`POST /v1/scans` reads JPEG and PNG. An `image` whose bytes are neither — a
+PDF, a HEIC photo, a text file, a file cut off after its first bytes — is now
+refused with 415 [`unsupported_media_type`](/errors/unsupported_media_type)
+before recognition runs. It used to reach recognition and come back as 500
+`internal_error`. Nothing is charged, and no free attempt of the sandbox key is
+spent.
+
 ## 2026-09-17 — 1.0.0, the first production release
 
 The document-recognition API, at version 1.
