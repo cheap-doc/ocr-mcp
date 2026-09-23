@@ -249,7 +249,8 @@ rather than recognising and charging a second time.
 
 No arguments. Returns the balance, the credits spent and this period's scan
 counters by status. With the public sandbox key there is no account behind the
-call, so it says that instead of reporting zeros that read like a balance.
+call: the balance comes back as `null`, and the first line says so and how to
+get a key, instead of reporting zeros that read like a balance.
 
 ```text
 Balance: 1840 credits · 63 scans this period (58 billed, 58 credits spent).
@@ -265,6 +266,34 @@ Full-text search over the documentation — endpoints, response fields, error
 codes, MRZ rules, retention, pricing — returning the matching sections with
 titles, snippets and links. It reads a copy shipped inside this package, so it
 makes no network call.
+
+Every tool declares an output schema, and every successful call returns
+`structuredContent` that matches it, beside the text blocks: the API's `Scan`
+for `scan_document`, its `Usage` for `check_balance`, and `{ "results": [...] }`
+for `search_docs`. A failed call is an error block with no structured content.
+
+## Resources
+
+Every page of the documentation this package ships is a read-only resource,
+`text/markdown`, with its title and description:
+
+```text
+doccheap://docs/reference/fields
+doccheap://docs/reference/errors
+doccheap://docs/errors/insufficient_credits
+```
+
+`resources/list` lists them all, and the template `doccheap://docs/{+slug}`
+looks one up by its path. Reading one makes no network call.
+
+## Prompts
+
+| Prompt | Argument | What it asks for |
+|---|---|---|
+| `scan_document_to_json` | `image_url` | Scan one image and present its printed fields, with the JSON underneath |
+| `check_document_expiry` | `image_url` | Scan one image and report the expiry date, whether it has expired and the days left |
+| `batch_scan` | `image_urls` | Check the balance, scan each address in turn, then tabulate the results and the failures |
+| `explain_error` | `error_code` | Explain an API error code from its documentation page, which is attached |
 
 ## Configuration
 
@@ -310,7 +339,7 @@ When it calls the doc.cheap API it identifies itself in the request's
 `User-Agent`, the way any HTTP client does:
 
 ```
-doc-cheap-mcp/0.2.0 (claude-code/1.4.2)
+doc-cheap-mcp/0.3.0 (claude-code/1.4.2)
 ```
 
 The first half is this package and its version. The second half is **the name
@@ -322,7 +351,7 @@ actually are. It is never used to change what the server does, and nothing else
 about you, your prompts, your files or your images travels with it.
 
 **Switching it off:** set `DO_NOT_TRACK=1` in the server's environment. The
-request then carries `doc-cheap-mcp/0.2.0` and nothing more — no client name, no
+request then carries `doc-cheap-mcp/0.3.0` and nothing more — no client name, no
 client version, no `baggage` header — and everything else works identically.
 
 Your API key already identifies your account to the API; that is what a key is
