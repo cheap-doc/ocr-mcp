@@ -455,8 +455,8 @@ export function buildServer(
   // read from the same documentation copy search_docs uses. Registered here,
   // in the one function both entry points call, so the hosted server and the
   // local one cannot offer different sets.
-  registerDocResources(server, config.docsDir);
-  registerPrompts(server, config.docsDir);
+  registerDocResources(server, config.docsDir, config.docsBase);
+  registerPrompts(server, config.docsDir, config.docsBase);
 
   return server;
 }

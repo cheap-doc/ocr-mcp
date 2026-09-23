@@ -1,3 +1,4 @@
+import { absoluteDocLinks } from "./vendor/contracts/doc-links.ts";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { findPage, uriForPage } from "./resources.ts";
@@ -26,7 +27,7 @@ const imageUrl = z
   .min(1)
   .describe("https: address of the document image, on a public internet address.");
 
-export function registerPrompts(server: McpServer, docsDir: string): void {
+export function registerPrompts(server: McpServer, docsDir: string, docsBase: string): void {
   server.registerPrompt(
     "scan_document_to_json",
     {
@@ -158,7 +159,8 @@ export function registerPrompts(server: McpServer, docsDir: string): void {
               resource: {
                 uri: uriForPage(page.slug),
                 mimeType: "text/markdown",
-                text: page.markdown,
+                // Full addresses, for the reason given in resources.ts.
+                text: absoluteDocLinks(page.markdown, docsBase),
               },
             },
           },
