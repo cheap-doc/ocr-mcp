@@ -72,7 +72,17 @@ VS Code, `.vscode/mcp.json` (the key is asked for once and stored by VS Code):
 Set `DOC_CHEAP_API_KEY` to your key. Leave it out and the server uses the public
 sandbox key, which runs 10 free recognitions and has no balance.
 
-### Claude Desktop
+### Claude Desktop — one-click extension
+
+Download `doc-cheap-<version>.mcpb` from the
+[latest release](https://gitlab.com/doccheap/ocr-mcp/-/releases) and open it, or
+drag it into the Claude Desktop window. The install screen asks for two optional
+settings: your API key (stored as a secret; leave it empty for the sandbox key)
+and the one folder `image_path` may read images from (leave it empty and no
+local file is read). Node.js ships with Claude Desktop, so nothing else needs
+installing.
+
+### Claude Desktop — by hand
 
 `claude_desktop_config.json`:
 
@@ -339,7 +349,7 @@ When it calls the doc.cheap API it identifies itself in the request's
 `User-Agent`, the way any HTTP client does:
 
 ```
-doc-cheap-mcp/0.3.0 (claude-code/1.4.2)
+doc-cheap-mcp/0.3.1 (claude-code/1.4.2)
 ```
 
 The first half is this package and its version. The second half is **the name
@@ -351,19 +361,32 @@ actually are. It is never used to change what the server does, and nothing else
 about you, your prompts, your files or your images travels with it.
 
 **Switching it off:** set `DO_NOT_TRACK=1` in the server's environment. The
-request then carries `doc-cheap-mcp/0.3.0` and nothing more — no client name, no
+request then carries `doc-cheap-mcp/0.3.1` and nothing more — no client name, no
 client version, no `baggage` header — and everything else works identically.
 
 Your API key already identifies your account to the API; that is what a key is
 for, and it is unaffected by the setting above.
 
-## Privacy
+## Privacy Policy
 
-Uploaded images are never stored. They live in memory for the length of the
-request and are gone when it ends. A **result** is kept for the window the call
-asked for in `retain_hours` — `0` stores nothing — or, when it asked for none,
-for the account's own history-retention setting. Nothing this server does is
-reported anywhere unless you set `DOC_CHEAP_SENTRY_DSN` yourself.
+The full policy is <https://doc.cheap/privacy>. What it says about this server:
+
+- **What is collected.** The image you ask it to read, sent to the doc.cheap API
+  (`https://api.doc.cheap`) — nowhere else. Its calls also name this package and
+  version, and the client you run it in (see the section above; `DO_NOT_TRACK=1`
+  removes the client). Your key identifies your account to the API.
+- **How it is used and stored.** The image is read and never stored: it lives
+  in memory for the length of the request. The **result** — the fields read off
+  the document — is kept for the window the call asked for in `retain_hours`
+  (`0` stores nothing) or, when it asked for none, for the account's
+  history-retention setting, which defaults to one year; expiry deletes it.
+- **Who else sees it.** Nobody the policy does not name: the hosting provider
+  and the network provider that carry the traffic. Nothing is sold or shared
+  for advertising. Nothing this server does is reported anywhere unless you set
+  `DOC_CHEAP_SENTRY_DSN` yourself.
+- **On your machine.** The server reads no file unless you name a folder for
+  `image_path`, and then only images inside it.
+- **Contact.** admin@doc.cheap.
 
 The hosted server keeps nothing either. Its log records which method and which
 tool a request called, how long it took and whether a key of your own was
