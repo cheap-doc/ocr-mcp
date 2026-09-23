@@ -22,8 +22,9 @@ smaller number that came from somewhere.
 Uptime here is not a port check, and it is not the share of requests that
 happened to succeed while traffic existed.
 
-A synthetic recognition runs once a minute. A drawn specimen is posted to the
-service's own scan endpoint over loopback. It travels the whole path a
+A synthetic recognition runs once a minute. A generated passport image, made
+for the purpose and belonging to nobody, is posted to the service's own scan
+endpoint over loopback. It travels the whole path a
 customer's call travels: the routing, the maintenance gate, the authentication
 guard, the rate limiter and the engine.
 

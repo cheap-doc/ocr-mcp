@@ -1,4 +1,6 @@
-import type { ScanOptionsInput } from "./vendor/contracts/reading.ts";
+import { type ScanOptionsInput } from "./vendor/contracts/reading.ts";
+import { Scan } from "./vendor/contracts/scan.ts";
+import { Usage } from "./vendor/contracts/usage.ts";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { type CallContext, createApiClient } from "./api-client.ts";
@@ -7,6 +9,8 @@ import { searchDocs } from "./docs-search.ts";
 import { ExpectedFailure, isExpectedFailure } from "./errors.ts";
 import { resolveImage } from "./image.ts";
 import { createNoopReporter, type Reporter } from "./observability/reporter.ts";
+import { registerPrompts } from "./prompts.ts";
+import { registerDocResources } from "./resources.ts";
 import { summarizeScan, summarizeUsage } from "./summary.ts";
 import { buildBaggage, buildUserAgent, clientIdentityFrom, doNotTrack } from "./user-agent.ts";
 import { SERVER_NAME, SERVER_VERSION } from "./version.ts";
@@ -34,6 +38,36 @@ export const SERVER_INSTRUCTIONS =
   "recognised and nothing at all when the image holds no readable document. Call " +
   "check_balance before working through a batch, and search_docs for field names, error " +
   "codes, MRZ rules and anything else about the API rather than guessing at them.";
+
+// What each tool's successful result carries as structured content, declared to
+// the client as the tool's output schema.
+//
+// scan_document and check_balance answer with the API's own objects, so their
+// schemas are the contract's — the same definitions the API's responses and
+// its OpenAPI document are built from, not a second description of them. Each
+// is re-wrapped in a plain object because the contract's carries a schema id,
+// which turns the top of the generated JSON Schema into a reference, and a
+// client requires an output schema whose top is `type: object`.
+//
+// The generated schemas forbid properties they do not name, and a client
+// checks the result against them, so the handlers below parse the API's answer
+// through the same schema before returning it: a field the API adds before the
+// contract names it is dropped here rather than failing the caller's call.
+const ScanOutput = z.object(Scan.shape);
+const UsageOutput = z.object(Usage.shape);
+const SearchOutput = z.object({
+  results: z
+    .array(
+      z.object({
+        title: z.string().describe("Heading of the matching documentation section."),
+        page: z.string().describe("Path of the page the section is on; empty for the home page."),
+        link: z.string().describe("Address of the section on the documentation site."),
+        snippet: z.string().describe("The start of the section's text."),
+        score: z.number().describe("Relevance: heading matches count five times a body match."),
+      }),
+    )
+    .describe("Matching sections, best first; empty when nothing matched."),
+});
 
 function textContent(text: string): { type: "text"; text: string } {
   return { type: "text", text };
@@ -233,6 +267,7 @@ export function buildServer(
           .optional()
           .describe("Makes a retried scan return the first result instead of charging again."),
       },
+      outputSchema: ScanOutput,
     },
     async (args, extra) => {
       try {
@@ -241,7 +276,7 @@ export function buildServer(
         if (args.expect_country !== undefined) options.expect_country = args.expect_country;
         if (args.return_portrait !== undefined) options.return_portrait = args.return_portrait;
         if (args.retain_hours !== undefined) options.retain_hours = args.retain_hours;
-        const scan = await api.createScan(
+        const answer = await api.createScan(
           {
             image,
             ...(Object.keys(options).length > 0 ? { options } : {}),
@@ -250,6 +285,7 @@ export function buildServer(
           },
           callContext(extra),
         );
+        const scan = ScanOutput.parse(answer);
         return {
           structuredContent: scan as unknown as Record<string, unknown>,
           content: [textContent(summarizeScan(scan)), textContent(JSON.stringify(scan, null, 2))],
@@ -288,31 +324,27 @@ export function buildServer(
         openWorldHint: true,
       },
       inputSchema: {},
+      outputSchema: UsageOutput,
     },
     async (_args, extra) => {
-      if (config.usingSandboxKey) {
-        return {
-          content: [
-            textContent(
-              remote
-                ? "No API key was sent, so the public demo sandbox key is in use and has no " +
-                    "balance. Register for a key and send it as `Authorization: Bearer <key>` to " +
-                    "check your balance and usage."
-                : "No API key is configured, so the public demo sandbox key is in use and has no " +
-                    "balance. Register for a key and set DOC_CHEAP_API_KEY to check your balance and " +
-                    "usage.",
-            ),
-          ],
-        };
-      }
       try {
-        const usage = await api.getUsage(callContext(extra));
+        const usage = UsageOutput.parse(await api.getUsage(callContext(extra)));
+        // Under the public sandbox key the API answers with its own standing —
+        // a null balance and the key's counters — which is well-formed but is
+        // nobody's account. The first line says so, and says how to get one, so
+        // a model does not read the counters as the caller's own.
+        const headline = !config.usingSandboxKey
+          ? summarizeUsage(usage)
+          : remote
+            ? "No API key was sent, so the public demo sandbox key is in use and has no " +
+              "balance. Register for a key and send it as `Authorization: Bearer <key>` to " +
+              "check your balance and usage."
+            : "No API key is configured, so the public demo sandbox key is in use and has no " +
+              "balance. Register for a key and set DOC_CHEAP_API_KEY to check your balance and " +
+              "usage.";
         return {
           structuredContent: usage as unknown as Record<string, unknown>,
-          content: [
-            textContent(summarizeUsage(usage)),
-            textContent(JSON.stringify(usage, null, 2)),
-          ],
+          content: [textContent(headline), textContent(JSON.stringify(usage, null, 2))],
         };
       } catch (error) {
         return failed(error, "check_balance");
@@ -353,6 +385,7 @@ export function buildServer(
           .optional()
           .describe("Maximum number of results (default 5)."),
       },
+      outputSchema: SearchOutput,
     },
     async (args) => {
       if (config.docsDir === "") {
@@ -368,7 +401,10 @@ export function buildServer(
       try {
         const hits = await searchDocs(config.docsDir, config.docsBase, args.query, args.limit ?? 5);
         if (hits.length === 0) {
-          return { content: [textContent(`No documentation matched "${args.query}".`)] };
+          return {
+            structuredContent: { results: [] },
+            content: [textContent(`No documentation matched "${args.query}".`)],
+          };
         }
         const lines = hits.map(
           (hit, index) => `${index + 1}. ${hit.title} — ${hit.link}\n   ${hit.snippet}`,
@@ -382,6 +418,13 @@ export function buildServer(
       }
     },
   );
+
+  // The documentation pages as resources and four ready-made prompts, both
+  // read from the same documentation copy search_docs uses. Registered here,
+  // in the one function both entry points call, so the hosted server and the
+  // local one cannot offer different sets.
+  registerDocResources(server, config.docsDir);
+  registerPrompts(server, config.docsDir);
 
   return server;
 }

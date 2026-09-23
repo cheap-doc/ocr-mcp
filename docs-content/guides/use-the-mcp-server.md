@@ -182,12 +182,35 @@ A recognized document draws one credit, $0.01. A scan that recognized nothing
 is counted and never charged, and `meta.billed` says which happened.
 
 `check_balance` needs a key with an account behind it. Under the public sandbox
-key it answers with a sentence saying there is no balance, rather than with
-zeros that look like a reading.
+key the balance comes back as `null`. Its first line says there is no balance,
+rather than showing zeros that look like a reading.
 
 `search_docs` takes a `query` and an optional `limit` between 1 and 20,
 defaulting to 5. It reads a copy of this documentation shipped beside the
 server, so it works with no network.
+
+Every tool declares an output schema. A successful call returns structured
+content that matches it: the `Scan` for `scan_document`, the `Usage` for
+`check_balance`, and a `results` list for `search_docs`. A failed call returns
+an error block and no structured content.
+
+## Read the docs as resources
+
+Every page of these docs is also a read-only MCP resource in markdown. Its
+address is its path, such as `doccheap://docs/reference/fields` or
+`doccheap://docs/errors/rate_limited`. The template `doccheap://docs/{+slug}`
+looks up any page by path. Reading one makes no network call.
+
+## Start from a prompt
+
+The server offers four prompts. Each one drives the tools above.
+
+| Prompt | Argument | What it asks for |
+|---|---|---|
+| `scan_document_to_json` | `image_url` | Scan one image and present its printed fields |
+| `check_document_expiry` | `image_url` | Report the expiry date, whether it has expired, and the days left |
+| `batch_scan` | `image_urls` | Check the balance, scan each address, then list the failures |
+| `explain_error` | `error_code` | Explain an error code from its documentation page |
 
 ## For AI agents
 

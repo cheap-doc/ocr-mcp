@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "cheap.doc/mcp",
   "description": "Passport, ID and MRZ recognition through the doc.cheap API — $0.01 per document",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "websiteUrl": "https://doc.cheap/docs/guides/use-the-mcp-server",
   "repository": {
     "url": "https://gitlab.com/doccheap/ocr-mcp",
@@ -12,7 +12,7 @@
     {
       "registryType": "npm",
       "identifier": "@doc-cheap/mcp",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "transport": {
         "type": "stdio"
       },

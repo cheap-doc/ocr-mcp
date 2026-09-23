@@ -17,7 +17,7 @@ export interface SearchHit {
   readonly score: number;
 }
 
-async function listMarkdown(dir: string): Promise<string[]> {
+export async function listMarkdown(dir: string): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
   const files: string[] = [];
   for (const entry of entries) {
@@ -33,7 +33,7 @@ async function listMarkdown(dir: string): Promise<string[]> {
 
 // The clean URL slug a page is served at: index.md is the home page (""),
 // nested files keep their path (errors/not_found).
-function slugForFile(root: string, file: string): string {
+export function slugForFile(root: string, file: string): string {
   const rel = relative(root, file).split(sep).join("/").replace(/\.md$/, "");
   return rel === "index" ? "" : rel;
 }

@@ -72,7 +72,8 @@ visitors never take spends attention for nothing.
 Availability of recognition is measured by a **synthetic recognition, once a
 minute**, not by a port check.
 
-A drawn specimen is posted to the service's own `POST /v1/scans` over loopback,
+The canary sends a generated passport image, made for the purpose and belonging
+to nobody. It is posted to the service's own `POST /v1/scans` over loopback,
 with `retain_hours: 0`, under a deadline of the engine's own timeout plus five
 seconds. It goes through the routing, the maintenance gate, the authentication
 guard, the rate limiter and the engine — the same path a customer's call takes.
