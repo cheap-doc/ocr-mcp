@@ -166,13 +166,15 @@ print(scan["meta"]["reference"], scan["images"]["main_photo"])
 when the scan produced nothing for it.
 
 - `document` — `kind`, `country`, `country_name`, `issuing_state`, `type_name`,
-  `type_confidence`, `is_expired` and `days_remaining`.
+  `type_confidence`, `number`, `series`, `issue_date`, `expiry_date`,
+  `is_expired` and `days_remaining`.
 - `holder` — `given_names`, `surname`, `full_name`, `birth_date`, `sex` and
   `nationality`.
 
 Everything the engine read off the printed page is in `fields`, one entry per
-reading. The document number and the personal number are entries there, under
-`document_number` and `personal_number`. The whole shape is laid out on
+reading. The document number is there too, under `document_number`, beside
+`document.number`; the personal number is only there, under
+`personal_number`. The whole shape is laid out on
 [the response](/reference/response).
 
 ## Read the same fact in two scripts
@@ -244,13 +246,14 @@ come back.
 
 Whichever layout it is, the zone fills the same values once it is read:
 `holder.surname`, `holder.given_names`, `holder.birth_date`, `holder.sex`,
-`holder.nationality`, `document.issuing_state`, the date of expiry behind
-`document.days_remaining`, and the `document_number` entry of `fields`. The
+`holder.nationality`, `document.issuing_state`, `document.number`,
+`document.expiry_date` with the `document.days_remaining` computed from it, and
+the `document_number` entry of `fields`. The
 `personal_number` entry comes from the zone's optional-data field, which TD2
 does not carry.
 
-No layout encodes a date of issue. The `issue_date` field is therefore a
-reading of the printed page. It is absent on a document whose visual zone was
+No layout encodes a date of issue. `document.issue_date` and the `issue_date`
+field are therefore a reading of the printed page. It is absent on a document whose visual zone was
 not read, even when the zone's check digits passed.
 
 A card prints its zone on the back, and this endpoint takes one image per call.

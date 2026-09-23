@@ -3,7 +3,8 @@ import { readFile, realpath } from "node:fs/promises";
 // Every throw below is a message for the caller to act on — a missing source, a
 // body over the ceiling, a server that answered badly — so all of them carry the
 // expected-failure marker and none of them becomes a report.
-import { ExpectedFailure } from "./errors.ts";
+import { ExpectedFailure, isExpectedFailure } from "./errors.ts";
+import { createPinnedFetch } from "./image-fetch.ts";
 import {
   type AddressLookup,
   assertAllowedImageUrl,
@@ -25,10 +26,26 @@ export interface ImageFetchDeps {
   readonly fetchImpl: typeof globalThis.fetch;
 }
 
+// The name is checked once up front, which answers the caller with the precise
+// reason, and again by the pinned client at the moment it connects, which is
+// the check that cannot be raced (`./image-fetch.ts`).
 const defaultDeps: ImageFetchDeps = {
   lookup: (hostname) => dnsLookup(hostname, { all: true }),
-  fetchImpl: (...args) => globalThis.fetch(...args),
+  fetchImpl: createPinnedFetch(),
 };
+
+// A request to the caller's own URL that never got an answer — refused,
+// reset, timed out, a certificate that does not verify. That is the URL's
+// problem, not this server's, so it goes back to the caller as a message.
+async function fetchOnce(deps: ImageFetchDeps, target: URL): Promise<Response> {
+  try {
+    return await deps.fetchImpl(target, { redirect: "manual" });
+  } catch (error) {
+    if (isExpectedFailure(error)) throw error;
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new ExpectedFailure(`Could not fetch image_url (${reason}).`);
+  }
+}
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 
@@ -81,7 +98,7 @@ export async function fetchImageBytes(
 ): Promise<Buffer> {
   let target = await assertAllowedImageUrl(rawUrl, deps.lookup);
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-    const response = await deps.fetchImpl(target, { redirect: "manual" });
+    const response = await fetchOnce(deps, target);
     if (REDIRECT_STATUSES.has(response.status)) {
       const location = response.headers.get("location");
       if (location === null) {
@@ -112,9 +129,19 @@ export async function fetchImageBytes(
  * file under one configured directory, or an https address on the public
  * internet. See `./image-guard.ts` for the rules and why they are drawn there.
  */
-export async function resolveImage(input: ImageInput): Promise<string> {
+export async function resolveImage(
+  input: ImageInput,
+  options: { readonly allowPath?: boolean } = {},
+): Promise<string> {
   if (input.image_base64) return stripDataUrl(input.image_base64);
   if (input.image_path) {
+    // The hosted server has no files of the caller's to read, and the files it
+    // does have are not the caller's business.
+    if (options.allowPath === false) {
+      throw new ExpectedFailure(
+        "image_path is not available on the hosted server, which cannot see your files; send the image as image_base64 or image_url.",
+      );
+    }
     const path = await resolveImagePathWithinRoot(
       input.image_path,
       process.env[IMAGE_ROOT_ENV],
@@ -127,5 +154,9 @@ export async function resolveImage(input: ImageInput): Promise<string> {
     const bytes = await fetchImageBytes(input.image_url);
     return bytes.toString("base64");
   }
-  throw new ExpectedFailure("Provide the image as one of image_base64, image_path or image_url.");
+  throw new ExpectedFailure(
+    options.allowPath === false
+      ? "Provide the image as one of image_base64 or image_url."
+      : "Provide the image as one of image_base64, image_path or image_url.",
+  );
 }

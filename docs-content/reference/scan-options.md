@@ -120,7 +120,6 @@ the message. Nothing reaches the recognition engine, and nothing is charged.
 | `"retain_hours": -1` | Below the minimum of 0 |
 | `"retain_hours": 1.5` | Not an integer |
 | `"retain_days": 7` | Not a key `options` declares |
-| `"response_version": "2"` | Not a key `options` declares; this API has one response shape |
 
 ## Which options interact
 

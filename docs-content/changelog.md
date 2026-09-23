@@ -23,8 +23,10 @@ barcode where one is printed.
 
 **One response shape.** Eight groups — `meta`, `document`, `holder`, `fields`,
 `mrz`, `images`, `quality` and `authenticity` — described key by key on
-[the response](/reference/response). Every key is present; an absent value is
-`null` and an absent collection is empty. `meta.schema_version` is `"1.0"`.
+[the response](/reference/response). `document` carries the document's kind,
+issuing state, number, series, date of issue and date of expiry, and whether it
+has expired. Every key is present; an absent value is `null` and an absent
+collection is empty. `meta.schema_version` is `"1.0"`.
 
 **Fields in every script.** Every field the engine reads is re-keyed to a
 stable vocabulary and published once per language, resolved from 418 assigned

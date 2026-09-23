@@ -6,14 +6,68 @@ printed fields back as structured JSON — **$0.01 per recognised document**, wi
 
 An [MCP](https://modelcontextprotocol.io) server over stdio, for Claude Desktop,
 Claude Code, Cursor, VS Code, Gemini CLI, Windsurf, Kiro and any other MCP
-client. It is a thin client of the public doc.cheap HTTP API and a copy of the
-documentation: it holds no data of its own.
+client — and the same server hosted at `https://mcp.doc.cheap/mcp` for clients
+that connect to a URL instead. It is a thin client of the public doc.cheap HTTP
+API and a copy of the documentation: it holds no data of its own.
 
 ```
 npx -y @doc-cheap/mcp
 ```
 
-## Install
+## Hosted — nothing to install
+
+`https://mcp.doc.cheap/mcp` serves the same three tools over Streamable HTTP. No
+login: send your key as `Authorization: Bearer sk_live_your_key`, or send no key
+and the public sandbox key is used, 10 free recognitions from your address. The
+hosted server cannot read files on your machine, so `scan_document` takes the
+image as `image_base64` or `image_url`; `image_path` is for the local server
+only.
+
+Claude Code:
+
+```bash
+claude mcp add --transport http doc-cheap https://mcp.doc.cheap/mcp --header "Authorization: Bearer sk_live_your_key"
+```
+
+Claude Desktop and claude.ai: *Settings → Connectors → Add custom connector*,
+URL `https://mcp.doc.cheap/mcp` (no key: the sandbox key is used).
+
+Cursor, `~/.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "doc-cheap": {
+      "url": "https://mcp.doc.cheap/mcp",
+      "headers": { "Authorization": "Bearer sk_live_your_key" }
+    }
+  }
+}
+```
+
+VS Code, `.vscode/mcp.json` (the key is asked for once and stored by VS Code):
+
+```json
+{
+  "servers": {
+    "doc-cheap": {
+      "type": "http",
+      "url": "https://mcp.doc.cheap/mcp",
+      "headers": { "Authorization": "Bearer ${input:doc-cheap-key}" }
+    }
+  },
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "doc-cheap-key",
+      "description": "doc.cheap API key",
+      "password": true
+    }
+  ]
+}
+```
+
+## Install locally
 
 Set `DOC_CHEAP_API_KEY` to your key. Leave it out and the server uses the public
 sandbox key, which runs 10 free recognitions and has no balance.
@@ -174,8 +228,9 @@ plus the optional `expect_country`, `return_portrait`, `retain_hours`,
 ```
 
 It answers with the whole `Scan` as structured JSON — `meta` (id, status,
-`billed`, confidence, timing), `document` (kind, issuing country, whether it has
-expired and how many days are left), `holder` (given names, surname, date of
+`billed`, confidence, timing), `document` (kind, issuing country, number,
+series, date of issue, date of expiry, whether it has expired and how many days
+are left), `holder` (given names, surname, date of
 birth, sex, nationality), `fields` (every field read off the printed page, each
 with its own confidence), `mrz` (whether the machine-readable zone checks out,
 why not when it does not, and its lines exactly as read), `images`, `quality`
@@ -255,7 +310,7 @@ When it calls the doc.cheap API it identifies itself in the request's
 `User-Agent`, the way any HTTP client does:
 
 ```
-doc-cheap-mcp/0.1.2 (claude-code/1.4.2)
+doc-cheap-mcp/0.2.0 (claude-code/1.4.2)
 ```
 
 The first half is this package and its version. The second half is **the name
@@ -267,7 +322,7 @@ actually are. It is never used to change what the server does, and nothing else
 about you, your prompts, your files or your images travels with it.
 
 **Switching it off:** set `DO_NOT_TRACK=1` in the server's environment. The
-request then carries `doc-cheap-mcp/0.1.2` and nothing more — no client name, no
+request then carries `doc-cheap-mcp/0.2.0` and nothing more — no client name, no
 client version, no `baggage` header — and everything else works identically.
 
 Your API key already identifies your account to the API; that is what a key is
@@ -280,6 +335,10 @@ request and are gone when it ends. A **result** is kept for the window the call
 asked for in `retain_hours` — `0` stores nothing — or, when it asked for none,
 for the account's own history-retention setting. Nothing this server does is
 reported anywhere unless you set `DOC_CHEAP_SENTRY_DSN` yourself.
+
+The hosted server keeps nothing either. Its log records which method and which
+tool a request called, how long it took and whether a key of your own was
+used — never the image, the result, the key or your address.
 
 ## Run it from source
 

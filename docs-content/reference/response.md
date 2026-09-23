@@ -11,7 +11,7 @@ verified: 1.0.0
 # The response
 
 The body `POST /v1/scans` returns, and the body `GET /v1/scans/{id}` returns
-for a stored scan. One response shape, with no way to ask for another.
+for a stored scan. Every scan answers in this one shape.
 
 The body answers the question a caller has: what does this document say, and can
 it be trusted. It does not hand over the recognition engine's working notes.
@@ -26,8 +26,8 @@ key, and a collection that is empty is `[]`. A consumer can read
 
 | Group | Type | What it carries |
 |---|---|---|
-| `meta` | object | The scan itself: its id, outcome, billing, timing and revision |
-| `document` | object or null | What the document is, and whether it is still valid |
+| `meta` | object | The scan itself: its id, outcome, billing, timing and version |
+| `document` | object or null | What the document is, its number and dates, and whether it is still valid |
 | `holder` | object or null | The person the document is about |
 | `fields` | array | Every field read off the printed document, re-keyed |
 | `mrz` | object | The machine-readable zone as a verdict, with its lines |
@@ -58,6 +58,10 @@ throughout the documentation.
     "issuing_state": "GRC",
     "type_name": "Greece - Passport",
     "type_confidence": "high",
+    "number": "AM7304518",
+    "series": null,
+    "issue_date": "2022-03-10",
+    "expiry_date": "2032-03-10",
     "is_expired": false,
     "days_remaining": 2001
   },
@@ -114,9 +118,8 @@ twenty.
 
 ### schema_version
 
-The revision of this body. A removal or a rename moves its major segment. A
-consumer that pins the value therefore fails loudly, rather than quietly reading
-a key that changed meaning.
+The version of this body, always `"1.0"`. A consumer that pins the value checks
+that the body is the one it was written against.
 
 It is not the `/v1` in the path. The path names the API; this names the shape of
 the body under it.
@@ -180,8 +183,20 @@ is `null` on a scan stored before the split was measured and read back later.
 | `issuing_state` | alpha-3 or null | Issuing state |
 | `type_name` | string or null | The full type name, for example `Greece - Passport` |
 | `type_confidence` | band | How strongly the type match is backed |
+| `number` | string or null | The document number, as printed |
+| `series` | string or null | The document series, when the document prints one as a field of its own |
+| `issue_date` | date or null | The date the document was issued |
+| `expiry_date` | date or null | The date the document expires |
 | `is_expired` | boolean or null | Whether the document had expired at the time of the scan |
 | `days_remaining` | integer or null | Days until expiry; negative once expired |
+
+The two dates are ISO 8601 calendar dates, `YYYY-MM-DD`, like
+`holder.birth_date`. `is_expired` and `days_remaining` are computed from
+`expiry_date`, so all three are `null` together when no expiry date was read.
+
+`series` is `null` for a document that prints no series of its own, which is
+most of them. It is never cut out of `number`: where a document prints the
+series and the number in one field, `number` carries that field whole.
 
 `type_name` carries no catalogue ordinal. The recognition engine appends a
 number to distinguish two catalogue entries that print the same name, and a
@@ -325,7 +340,7 @@ from storage carries, because a stored result keeps no engine output. Reporting
 that as a pass would vouch for a picture the process never saw.
 
 No per-check breakdown is published. The engine's own check types are integers
-with no verified name map, so a breakdown handed a reader `check_7: fail` and
+with no verified name map, so a breakdown would hand a reader `check_7: fail` and
 nothing to act on.
 
 ## authenticity
@@ -368,12 +383,12 @@ Four rules cover the shapes a consumer meets.
 2. Key `fields` by `id`, never by `name`.
 3. Branch on `status` before reading data. Four of the five outcomes carry
    little or nothing.
-4. Pin `meta.schema_version`. A consumer that asserts `"1.0"` learns about a
-   change from its own tests rather than from a wrong value in production.
+4. Pin `meta.schema_version`. A consumer that asserts `"1.0"` checks, in its own
+   tests, that the body is the one it was written against.
 
 ## Related
 
 - [Scan options](/reference/scan-options) — what a request can set.
 - [POST /v1/scans](/reference/endpoints/create-a-scan) — the endpoint, its
   headers and every status it answers with.
-- [Versioning](/reference/versioning) — what a breaking change would be.
+- [Versioning](/reference/versioning) — what the version covers.

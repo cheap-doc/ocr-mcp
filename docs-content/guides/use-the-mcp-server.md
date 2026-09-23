@@ -18,6 +18,38 @@ The server is a thin client of the public HTTP API. It holds no data of its
 own, speaks Model Context Protocol over stdio, and is launched by your client
 as a command. One recognized document costs one credit, $0.01.
 
+## Connect to the hosted server
+
+The same three tools are hosted at `https://mcp.doc.cheap/mcp` over Streamable
+HTTP, for a client that connects to a URL rather than launching a command. No
+login is needed. Send your key as `Authorization: Bearer sk_live_your_key`, or
+send none and the public sandbox key is used, with 10 free recognitions from
+your address.
+
+The hosted server cannot read files on your machine, so `scan_document` takes
+the image as `image_base64` or `image_url` there.
+
+```bash
+claude mcp add --transport http doc-cheap https://mcp.doc.cheap/mcp --header "Authorization: Bearer sk_live_your_key"
+```
+
+In Cursor the entry names a `url` and its `headers` instead of a command:
+
+```json
+{
+  "mcpServers": {
+    "doc-cheap": {
+      "url": "https://mcp.doc.cheap/mcp",
+      "headers": { "Authorization": "Bearer sk_live_your_key" }
+    }
+  }
+}
+```
+
+In VS Code, `.vscode/mcp.json` gives the entry `"type": "http"` and the same
+`url` and `headers`. In Claude Desktop and claude.ai, add it under Settings,
+Connectors, as a custom connector with that URL.
+
 ## Install it
 
 The package is `@doc-cheap/mcp`, and every client below starts it with `npx`.

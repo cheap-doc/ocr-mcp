@@ -57,6 +57,31 @@ function toolError(error: unknown): ToolErrorResult {
   return { isError: true, content: [textContent(message)] };
 }
 
+// What differs when this server is the hosted one rather than a process on the
+// caller's own machine. Absent, the server is the local one.
+export interface RemoteContext {
+  // The address of the person calling, passed on to the API so its
+  // per-address limits count that person rather than this server.
+  readonly clientAddress: string | null;
+}
+
+export interface BuildOptions {
+  readonly remote?: RemoteContext;
+}
+
+// The image inputs scan_document offers, and the sentence describing them.
+// Hosted, there is no local file of the caller's to read, so `image_path` is
+// neither offered nor mentioned; everything else about the tool is the same.
+function imageInputsSentence(remote: boolean): string {
+  return remote
+    ? "Inputs: the image as image_base64 or image_url (https, on a public address); plus the " +
+        "optional expect_country, return_portrait, retain_hours, reference and idempotency_key. "
+    : "Inputs: the image as image_base64 (always available), image_path (a local file, and " +
+        "only inside the directory DOC_CHEAP_IMAGE_ROOT names) or image_url (https, on a " +
+        "public address); plus the optional expect_country, return_portrait, retain_hours, " +
+        "reference and idempotency_key. ";
+}
+
 // Builds the MCP server and registers the three doc-cheap tools. The server is
 // a thin client of the public HTTP API and the documentation content; it holds
 // no data of its own.
@@ -67,7 +92,9 @@ function toolError(error: unknown): ToolErrorResult {
 export function buildServer(
   config: McpConfig,
   reporter: Reporter = createNoopReporter(),
+  options: BuildOptions = {},
 ): McpServer {
+  const remote = options.remote !== undefined;
   const server = new McpServer(
     { name: SERVER_NAME, version: SERVER_VERSION },
     { instructions: SERVER_INSTRUCTIONS },
@@ -90,6 +117,7 @@ export function buildServer(
     return {
       userAgent: buildUserAgent(identity, { doNotTrack: suppressed }),
       ...(baggage === null ? {} : { baggage }),
+      ...(options.remote?.clientAddress ? { clientAddress: options.remote.clientAddress } : {}),
     };
   }
 
@@ -112,12 +140,10 @@ export function buildServer(
       description:
         "Recognise a passport, national ID card or driver's licence from a photo or scan and " +
         "return what is printed on it as structured JSON. " +
-        "Inputs: the image as image_base64 (always available), image_path (a local file, and " +
-        "only inside the directory DOC_CHEAP_IMAGE_ROOT names) or image_url (https, on a " +
-        "public address); plus the optional expect_country, return_portrait, retain_hours, " +
-        "reference and idempotency_key. " +
+        imageInputsSentence(remote) +
         "Output: a Scan object — meta (id, status, billed, confidence, timing), document " +
-        "(kind, issuing country, whether it has expired and how many days are left), holder " +
+        "(kind, issuing country, number, series, date of issue, date of expiry, whether it " +
+        "has expired and how many days are left), holder " +
         "(given names, surname, date of birth, sex, nationality), fields (every field read " +
         "off the printed page, each with its own confidence), mrz (whether the " +
         "machine-readable zone checks out, why not when it does not, and its lines exactly " +
@@ -158,13 +184,17 @@ export function buildServer(
           .string()
           .optional()
           .describe("The document image as base64 (a data: URL is also accepted)."),
-        image_path: z
-          .string()
-          .optional()
-          .describe(
-            "Path to a local image file, inside the directory named by DOC_CHEAP_IMAGE_ROOT. " +
-              "Disabled unless that variable is set; send image_base64 instead.",
-          ),
+        ...(remote
+          ? {}
+          : {
+              image_path: z
+                .string()
+                .optional()
+                .describe(
+                  "Path to a local image file, inside the directory named by DOC_CHEAP_IMAGE_ROOT. " +
+                    "Disabled unless that variable is set; send image_base64 instead.",
+                ),
+            }),
         image_url: z
           .string()
           .optional()
@@ -206,7 +236,7 @@ export function buildServer(
     },
     async (args, extra) => {
       try {
-        const image = await resolveImage(args);
+        const image = await resolveImage(args, { allowPath: !remote });
         const options: ScanOptionsInput = {};
         if (args.expect_country !== undefined) options.expect_country = args.expect_country;
         if (args.return_portrait !== undefined) options.return_portrait = args.return_portrait;
@@ -264,9 +294,13 @@ export function buildServer(
         return {
           content: [
             textContent(
-              "No API key is configured, so the public demo sandbox key is in use and has no " +
-                "balance. Register for a key and set DOC_CHEAP_API_KEY to check your balance and " +
-                "usage.",
+              remote
+                ? "No API key was sent, so the public demo sandbox key is in use and has no " +
+                    "balance. Register for a key and send it as `Authorization: Bearer <key>` to " +
+                    "check your balance and usage."
+                : "No API key is configured, so the public demo sandbox key is in use and has no " +
+                    "balance. Register for a key and set DOC_CHEAP_API_KEY to check your balance and " +
+                    "usage.",
             ),
           ],
         };

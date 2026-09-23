@@ -1,10 +1,12 @@
 # Publishes @doc-cheap/mcp to npm.
 #
 # This repository is the generated public mirror of one package; the server is
-# developed elsewhere and every file here except this one is written by the
-# sync script. The pipeline exists here rather than beside the sources because
-# npm's trusted publishing accepts an OIDC token only from GitLab.com's own
-# instance runners and only from a public project, and the development
+# developed elsewhere and every file here, this one included, is written by the
+# sync script — edit it there, not here. The canonical copy sits beside the
+# server's sources, because a file the sync did not know about was a file the
+# next sync deleted. The pipeline runs here rather than beside those sources
+# because npm's trusted publishing accepts an OIDC token only from GitLab.com's
+# own instance runners and only from a public project, and the development
 # repository is private and builds on a self-hosted runner.
 #
 # No credential is stored anywhere: GitLab mints the two ID tokens below, npm

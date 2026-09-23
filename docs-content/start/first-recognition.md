@@ -110,6 +110,10 @@ invented specimen, and the long base64 crops are elided.
     "issuing_state": "GRC",
     "type_name": "Greece - Passport",
     "type_confidence": "high",
+    "number": "AM7304518",
+    "series": null,
+    "issue_date": "2022-03-10",
+    "expiry_date": "2032-03-10",
     "is_expired": false,
     "days_remaining": 2001
   },
@@ -185,6 +189,10 @@ contract, and it is the id `GET /v1/scans/{id}` takes.
 
 `document` and `holder` carry the curated values, and each is `null` as a whole
 when the scan produced nothing for it, rather than an object of nulls.
+
+`document.number`, `document.issue_date` and `document.expiry_date` are the
+document's own number and dates. `document.series` is `null` here because a
+Greek passport prints no separate series.
 
 Dates are ISO 8601 (`YYYY-MM-DD`). Countries are ISO 3166-1 alpha-3, with
 `country_name` beside the code for display. `document.days_remaining` counts

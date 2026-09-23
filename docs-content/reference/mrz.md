@@ -73,8 +73,8 @@ Whichever format it is, the zone fills the same values once it is read.
 
 - `holder.surname`, `holder.given_names`, `holder.birth_date`, `holder.sex`
   and `holder.nationality`
-- `document.issuing_state`, and `document.days_remaining` through the date of
-  expiry
+- `document.issuing_state`, `document.number`, and `document.expiry_date` with
+  the `document.days_remaining` computed from it
 - the `document_number` and `personal_number` entries of `fields`
 
 The personal number comes from the zone's optional-data field, which TD2 does

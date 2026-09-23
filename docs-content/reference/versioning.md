@@ -1,6 +1,6 @@
 ---
 title: Versioning
-description: One response shape, one version, and what would count as a breaking change to it.
+description: One response shape, one version, and what a consumer can rely on.
 type: reference
 keyword: api versioning policy
 nav: Versioning
@@ -15,24 +15,20 @@ Two numbers are published, and they say different things.
 | Number | Where | What it names |
 |---|---|---|
 | `v1` | The path, `https://api.doc.cheap/v1/…` | The API: its endpoints, its authentication, its error shape |
-| `1.0` | `meta.schema_version` in every result | The revision of the response body |
+| `1.0` | `meta.schema_version` in every result | The version of the response body |
 
-One response shape exists, and no way to ask for another. A request that tries
-to select one is refused with 422
-[`validation_failed`](/errors/validation_failed) naming what it sent. Silently
-serving the only shape there is would leave the caller believing something else
-arrived.
+Every scan answers in one response shape. No header or option selects the
+shape, and a request that sends one is refused with 422
+[`validation_failed`](/errors/validation_failed) naming what it sent.
 
 ## `meta.schema_version`
 
 Every result carries it, and its value is `"1.0"`.
 
-It is a string, not a number: `"1.0"` and `"1.10"` are different revisions, and
-arithmetic on them is wrong.
+It is a string, not a number. Compare it as a string; arithmetic on it is wrong.
 
-A consumer that pins the value fails loudly on a revision it was not written
-for, which is the point of publishing it. A consumer that reads the body without
-checking gets whatever the current revision means by each key.
+A consumer that pins the value checks that the body is the one it was written
+against, which is the point of publishing it.
 
 ## What counts as breaking
 
@@ -54,8 +50,8 @@ without the consumer changing.
 | Adding an error code to an endpoint that already answers errors | No |
 | Widening an accepted range | No |
 
-A removal or a rename moves the **major** segment of
-`meta.schema_version`. An addition moves the minor segment.
+Nothing in the non-breaking column changes `meta.schema_version`: a key added
+to the body arrives under `"1.0"`.
 
 ## What a consumer should assume
 
@@ -74,18 +70,9 @@ non-breaking column without a release.
 
 ## How a breaking change would be announced
 
-Nothing here has broken yet — version 1 is the first production version, and
-this section describes what would happen rather than what has.
-
-A breaking change to the response body would arrive as a new major
-`meta.schema_version`. The previous revision would keep being served to callers
-that ask for it, by a mechanism published with the change. A breaking change to
-the API itself would arrive under a new path segment beside `/v1`, and `/v1`
-would keep answering.
-
-Either would be announced on the [changelog](/changelog), which carries an
-Atom feed at [`/changelog/feed.xml`](/changelog/feed.xml), before the change
-lands rather than with it.
+A breaking change would be announced on the [changelog](/changelog), which
+carries an Atom feed at [`/changelog/feed.xml`](/changelog/feed.xml), before the
+change lands rather than with it.
 
 An address, once published, keeps working. The per-code error pages are the
 clearest case. `docs_url` in an error body is `/errors/<code>`, and a body

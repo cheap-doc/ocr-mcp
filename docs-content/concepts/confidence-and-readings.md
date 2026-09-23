@@ -87,11 +87,10 @@ to walk a list to get it. The list is there when the choice matters.
 `quality.overall` is a single word about the uploaded picture, and there is no
 breakdown beside it.
 
-An earlier shape published the engine's own list of checks. Each check was
-named by an integer, and those integers have no verified map to anything a
-person can read. A caller was handed `check_7: fail` and could act on none of
-it. Not on which check it was, not on what would satisfy it, not on whether it
-mattered.
+The engine's own list of checks is not published. Each check is named by an
+integer, and those integers have no verified map to anything a person can read.
+A caller handed `check_7: fail` could act on none of it. Not on which check it
+was, not on what would satisfy it, not on whether it mattered.
 
 One verdict a caller can act on is worth more than a list they cannot. A scan
 whose quality reads `fail` is a scan to re-photograph, and that is the whole

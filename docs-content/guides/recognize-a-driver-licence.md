@@ -163,8 +163,9 @@ per language under the same `name`, and only `id` is unique across the array.
 
 ## Dates and the countdown to the end of validity
 
-Every date is ISO 8601. A licence that names the date it runs out also gets
-`document.days_remaining` and a derived `days_to_expire` field. Both count from
+Every date is ISO 8601. A licence that names the date it runs out carries it as
+`document.expiry_date`, and the date it was issued as `document.issue_date`. It
+also gets `document.days_remaining` and a derived `days_to_expire` field. Both count from
 the day of the scan and go negative once the licence has run out. The field
 carries its value as a string, the way every entry of `fields[]` does.
 

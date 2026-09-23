@@ -6,9 +6,8 @@ import { z } from "zod";
 import { ScanId, ScanStatus, ScanTiming } from "./reading.ts";
 
 // The recognition result. There is one response shape and every scan answers
-// in it: no negotiation, no per-call selection, no second body to keep working.
-// `meta.schema_version` is the literal "1.0" and the only thing that can move
-// it is a new major, which would be a new path rather than a second shape here.
+// in it: no negotiation and no per-call selection. `meta.schema_version` is the
+// literal "1.0".
 //
 // The shape answers the question a caller actually has — "what does this
 // document say, and can I trust it?" — rather than handing over the engine's
@@ -98,14 +97,13 @@ export type ScanField = z.infer<typeof ScanField>;
 
 export const ScanMeta = z
   .object({
-    // The revision of this body. A removal or a rename moves the major
-    // segment, so a consumer that pins the value fails loudly instead of
-    // quietly reading a key that no longer means what it did.
+    // The version of this body, published so a consumer can pin the contract
+    // it was written against and fail loudly rather than read a body it does
+    // not understand.
     schema_version: z.literal("1.0").meta({
       description:
-        "The revision of this body, always `1.0`. A key removed or renamed moves the major " +
-        "segment, so a consumer that pins this value stops loudly rather than reading a key " +
-        "that no longer means what it did.",
+        "The version of this body, always `1.0`. A consumer that pins this value checks that " +
+        "the body is the one it was written against.",
     }),
     id: ScanId,
     status: ScanStatus,
@@ -153,6 +151,32 @@ export const ScanDocument = z
       }),
     type_confidence: ConfidenceBand.meta({
       description: "How strongly the document-type match is backed.",
+    }),
+    number: z
+      .string()
+      .nullable()
+      .meta({
+        description:
+          "The document number, as printed. Null when none was read. A series the document " +
+          "prints separately is in `series`, never folded into this value.",
+        example: "AM7304518",
+      }),
+    series: z
+      .string()
+      .nullable()
+      .meta({
+        description:
+          "The document series, for a document that prints one as a field of its own. Null " +
+          "when the document carries none or none was read; it is never split out of `number`.",
+      }),
+    issue_date: IsoDate.nullable().meta({
+      description:
+        "The date the document was issued, ISO-8601 (`YYYY-MM-DD`). Null when none was read.",
+    }),
+    expiry_date: IsoDate.nullable().meta({
+      description:
+        "The date the document expires, ISO-8601 (`YYYY-MM-DD`). Null when none was read; " +
+        "`is_expired` and `days_remaining` are computed from it.",
     }),
     is_expired: z
       .boolean()

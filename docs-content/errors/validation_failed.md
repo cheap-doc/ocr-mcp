@@ -27,7 +27,7 @@ The wording depends on which of the cases above it was.
 
 ```text
 /options/mode: Invalid option: expected one of "full"
-The accept-version header is not part of this API. There is one response shape; remove the header.
+The accept-version header is not part of this API; remove the header.
 ```
 
 ## The fix

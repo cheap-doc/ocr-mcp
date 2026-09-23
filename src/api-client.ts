@@ -25,6 +25,12 @@ export interface ScanInput {
 export interface CallContext {
   readonly userAgent: string;
   readonly baggage?: string | null;
+  // The address of the person calling, when this server is the hosted one and
+  // is calling the API on their behalf. Without it every hosted caller would
+  // reach the API from this server's own address and share one per-address
+  // allowance. Absent when the server runs on the caller's own machine, where
+  // the caller's address is already the one the API sees.
+  readonly clientAddress?: string | null;
 }
 
 export interface ApiClient {
@@ -75,6 +81,13 @@ export function createApiClient(config: McpConfig): ApiClient {
       "user-agent": context.userAgent,
     };
     if (context.baggage) withIdentity.baggage = context.baggage;
+    if (context.clientAddress) {
+      // Both headers, because the API believes the edge's client header only
+      // from a peer it trusts, and a forwarded-for chain is how it recognises
+      // that peer as one it trusts.
+      withIdentity["x-forwarded-for"] = context.clientAddress;
+      withIdentity["cf-connecting-ip"] = context.clientAddress;
+    }
     return withIdentity;
   }
 
