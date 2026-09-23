@@ -9,7 +9,7 @@ section: Concepts
 
 # What a billed scan is
 
-**1¢ per document. Same price for everyone — from 1 to 100 million documents.**
+**1¢ per document. Same price for everyone, at any volume — the first document and the ten-millionth cost the same.**
 
 One credit is one US cent, and one credit buys the recognition of one
 document. That is the whole price list. No seats, no minimums, no negotiated

@@ -1,3 +1,4 @@
+import { absoluteDocLinks } from "./vendor/contracts/doc-links.ts";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import {
   ListResourcesRequestSchema,
@@ -42,7 +43,10 @@ export async function findPage(docsDir: string, slug: string): Promise<DocPage |
 // search_docs already reads, so a read makes no network call; a server that
 // shipped without that copy answers with an empty list rather than an error,
 // because having no pages is a state, not a failure of the call.
-export function registerDocResources(server: McpServer, docsDir: string): void {
+// `docsBase` is where the published site lives: the pages link to each other
+// with site-absolute paths, which mean nothing to a client holding the text, so
+// what a read returns carries them as full addresses on that site.
+export function registerDocResources(server: McpServer, docsDir: string, docsBase: string): void {
   server.server.registerCapabilities({ resources: {} });
 
   server.server.setRequestHandler(ListResourcesRequestSchema, async () => ({
@@ -77,6 +81,8 @@ export function registerDocResources(server: McpServer, docsDir: string): void {
     if (!page) {
       throw new McpError(RESOURCE_NOT_FOUND, `Resource not found: ${uri}`, { uri });
     }
-    return { contents: [{ uri, mimeType: MARKDOWN, text: page.markdown }] };
+    return {
+      contents: [{ uri, mimeType: MARKDOWN, text: absoluteDocLinks(page.markdown, docsBase) }],
+    };
   });
 }

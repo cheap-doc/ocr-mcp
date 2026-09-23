@@ -11,6 +11,15 @@ section: Changelog
 Dated, public record of changes to the API and its documentation. The most
 recent change is first.
 
+## 2026-09-24 — 1.29.0, the list endpoint documented, links that resolve
+
+`GET /v1/scans` now has its own reference page, like the other three
+endpoints, and is listed in `llms.txt`. The markdown copies of the pages and
+`llms-full.txt` carry their links as full addresses, so a link followed from
+one of them lands on its page. When the public sandbox key runs out of
+requests for the hour, the refusal now says so: `Sandbox limit of 10 requests
+per hour per IP reached.`
+
 ## 2026-09-24 — 1.28.0, an image that is not one is refused
 
 `POST /v1/scans` reads JPEG and PNG. An `image` whose bytes are neither — a
