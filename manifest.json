@@ -1,0 +1,73 @@
+{
+  "manifest_version": "0.3",
+  "name": "doc-cheap",
+  "display_name": "doc.cheap — passport & ID OCR",
+  "version": "0.3.1",
+  "description": "Reads the printed fields from a photo or scan of a passport, national ID card or driver's licence and returns them as JSON.",
+  "long_description": "Give Claude a photo or scan of a passport, national ID card or driver's licence and get back what is printed on it — names, dates, document number, issuing country and the machine-readable zone — as structured JSON, through the doc.cheap API.\n\nIt costs $0.01 for each document actually recognised; an unreadable image costs nothing. With no API key the public sandbox key is used, which runs 10 free recognitions. The server also checks your remaining credits and searches the doc.cheap API documentation, which ships inside the extension.\n\nThe server sends the image to the doc.cheap API only, and the API does not store it.",
+  "author": {
+    "name": "doc.cheap",
+    "email": "admin@doc.cheap",
+    "url": "https://doc.cheap"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/doccheap/ocr-mcp"
+  },
+  "homepage": "https://doc.cheap/mcp",
+  "documentation": "https://doc.cheap/docs",
+  "support": "mailto:admin@doc.cheap",
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "DOC_CHEAP_API_KEY": "${user_config.api_key}",
+        "DOC_CHEAP_IMAGE_ROOT": "${user_config.image_root}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "scan_document",
+      "description": "Read a passport, national ID card or driver's licence from an image and return its printed fields as JSON."
+    },
+    {
+      "name": "check_balance",
+      "description": "Show how many doc.cheap credits the configured API key has left."
+    },
+    {
+      "name": "search_docs",
+      "description": "Search the doc.cheap API documentation that ships with the extension."
+    }
+  ],
+  "keywords": ["ocr", "passport", "id-card", "drivers-licence", "mrz", "document-recognition"],
+  "license": "MIT",
+  "privacy_policies": ["https://doc.cheap/privacy"],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  },
+  "user_config": {
+    "api_key": {
+      "type": "string",
+      "title": "doc.cheap API key",
+      "description": "Optional. Leave it empty to use the public sandbox key, which runs 10 free recognitions. Get a key at https://doc.cheap/register.",
+      "sensitive": true,
+      "required": false,
+      "default": ""
+    },
+    "image_root": {
+      "type": "directory",
+      "title": "Folder to read document images from",
+      "description": "Optional. The one folder the server may open images in when you ask it to read a file by name. Leave it empty and it reads no local files; images can still be passed directly or by https URL.",
+      "required": false,
+      "default": ""
+    }
+  }
+}

@@ -12,6 +12,10 @@
 # No credential is stored anywhere: GitLab mints the two ID tokens below, npm
 # exchanges the first for a publish credential that lives for the length of the
 # call, and signs a provenance attestation with the second.
+#
+# The same tag also builds the MCP Bundle (`.mcpb`, the one-click install for
+# Claude Desktop), puts it in this project's package registry with the job's
+# own token, and creates the release that links it.
 
 default:
   image: node:24-alpine
@@ -19,6 +23,7 @@ default:
 stages:
   - verify
   - publish
+  - release
 
 # The steps a release runs, minus the publish itself. Cutting a tag against a
 # tree that cannot be built is the failure worth catching before the version
@@ -37,6 +42,14 @@ verify:
     - npm run typecheck
     - npm run build
     - npm publish --dry-run --access public
+    # The bundle is validated and packed by the official MCPB CLI on every
+    # push, so a manifest the CLI refuses stops here, before a tag.
+    - node pack-mcpb.mjs
+  artifacts:
+    paths:
+      - dist-mcpb/*.mcpb
+      - dist-mcpb/*.sha256
+    expire_in: 1 week
 
 publish:
   stage: publish
@@ -73,3 +86,47 @@ publish:
     # No --provenance flag: under trusted publishing npm attests automatically,
     # and only for a public package out of a public repository, which this is.
     - npm publish --access public
+
+# The MCP Bundle for the tag. It runs after the npm publish because a bundle
+# of a version npm refused would describe a package nobody can install.
+bundle:
+  stage: publish
+  needs: [publish]
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v/ && $CI_PROJECT_PATH == "doccheap/ocr-mcp"
+  interruptible: false
+  script:
+    - npm install
+    - npm run build
+    - node pack-mcpb.mjs
+    - node upload-mcpb.mjs
+  artifacts:
+    paths:
+      - dist-mcpb/*.mcpb
+      - dist-mcpb/*.sha256
+    reports:
+      dotenv: bundle.env
+
+# The release for the tag, linking the bundle under the release's own stable
+# address: `/-/releases/<tag>/downloads/<file>` redirects to the package file,
+# and it is the form the MCP registry accepts for a GitLab-hosted bundle.
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/cli:latest
+  needs:
+    - job: bundle
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v/ && $CI_PROJECT_PATH == "doccheap/ocr-mcp"
+  script:
+    - echo "release $CI_COMMIT_TAG with $MCPB_FILE (sha256 $MCPB_SHA256)"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: $CI_COMMIT_TAG
+    description: "@doc-cheap/mcp $CI_COMMIT_TAG on npm, and the Claude Desktop extension $MCPB_FILE (SHA-256 $MCPB_SHA256)."
+    assets:
+      links:
+        - name: $MCPB_FILE
+          url: $MCPB_PACKAGE_URL
+          filepath: /$MCPB_FILE
+          link_type: package
