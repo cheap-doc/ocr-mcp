@@ -39,11 +39,11 @@ unsubscribe from.
 
 Caching, so polling is cheap:
 
-- `summary.json` — `cache-control: public, max-age=30, stale-while-revalidate=300`
+- `summary.json` – `cache-control: public, max-age=30, stale-while-revalidate=300`
   and a strong `ETag`. The document is rebuilt once a minute, so a poller that
   sends `If-None-Match` gets `304 Not Modified` most of the time.
-- `history.json` — `public, max-age=300`, also with an `ETag`.
-- `incidents.json` — `public, max-age=60`.
+- `history.json` – `public, max-age=300`, also with an `ETag`.
+- `incidents.json` – `public, max-age=60`.
 
 Every document starts with a `schema` number: branch on it before parsing the
 rest, because it changes when the shape does. One address may make 60 requests a
@@ -76,7 +76,7 @@ The canary sends a generated passport image, made for the purpose and belonging
 to nobody. It is posted to the service's own `POST /v1/scans` over loopback,
 with `retain_hours: 0`, under a deadline of the engine's own timeout plus five
 seconds. It goes through the routing, the maintenance gate, the authentication
-guard, the rate limiter and the engine — the same path a customer's call takes.
+guard, the rate limiter and the engine – the same path a customer's call takes.
 
 Only a scan proves a scan works. Three consecutive failures mark recognition
 down.
@@ -118,7 +118,7 @@ component, with a fixed sentence that names nothing about the cause. A second
 component that goes down joins that incident rather than starting another one.
 Fifteen minutes after everything it names is working again it moves to
 `monitoring`, and it is resolved by a person. The vocabulary is the one other
-status pages use — `investigating`, `identified`, `monitoring`, `resolved`, with
+status pages use – `investigating`, `identified`, `monitoring`, `resolved`, with
 an impact of `none`, `minor`, `major` or `critical`.
 
 The headline at the top of the page is derived from the components, never set
@@ -180,7 +180,7 @@ behind it.
 ## The per-process snapshot
 
 `GET https://api.doc.cheap/status.json` is a different and much smaller thing.
-It carries one API process's request latency — p50, p95 and p99 over a rolling
+It carries one API process's request latency – p50, p95 and p99 over a rolling
 window of recent requests. It also reports how long that process has been up
 since its last restart. It is useful for looking at a single instance, and it
 says nothing about the service over time. For that, read the status page above.

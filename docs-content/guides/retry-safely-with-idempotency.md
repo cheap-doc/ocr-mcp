@@ -16,8 +16,8 @@ and the retry returns the first result instead of producing a second one.
 ## Send a key
 
 `Idempotency-Key` is a request header on `POST /v1/scans`, between 1 and 255
-characters. Generate one per logical operation — one document you are trying to
-read — and reuse it for every retry of that operation.
+characters. Generate one per logical operation – one document you are trying to
+read – and reuse it for every retry of that operation.
 
 ```bash runnable tab=curl
 curl -X POST https://api.doc.cheap/v1/scans \
@@ -91,7 +91,7 @@ collide.
 ## What makes two requests the same
 
 The key alone does not. Each claim also carries a fingerprint of the request
-body — a digest over `image`, `options` and `reference`, with the keys sorted so
+body – a digest over `image`, `options` and `reference`, with the keys sorted so
 that property order cannot change it.
 
 - Same key, same body: a replay. The first result comes back.
@@ -244,8 +244,8 @@ dropped. The key is then free for an honest retry.
 
 ## Next
 
-- [Handle errors](/guides/handle-errors) — every code, and what to do with it.
-- [Idempotency](/reference/idempotency) — the exact rules, including how long a
+- [Handle errors](/guides/handle-errors) – every code, and what to do with it.
+- [Idempotency](/reference/idempotency) – the exact rules, including how long a
   key is remembered.
-- [Control history retention](/guides/control-history-retention) — the window a
+- [Control history retention](/guides/control-history-retention) – the window a
   replay depends on.

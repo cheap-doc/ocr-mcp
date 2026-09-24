@@ -47,8 +47,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`registration_required`](/errors/registration_required) — the anonymous allowance is spent.
-- [`document_repeated`](/errors/document_repeated) — the same image, too many times.
+- [`registration_required`](/errors/registration_required) – the anonymous allowance is spent.
+- [`document_repeated`](/errors/document_repeated) – the same image, too many times.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

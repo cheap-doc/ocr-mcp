@@ -93,7 +93,7 @@ That makes `retain_hours` the control:
 
 | The first request asked for | A later retry under the same key |
 |---|---|
-| `retain_hours: 0` | 409 [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) — the result was returned once and never written down |
+| `retain_hours: 0` | 409 [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) – the result was returned once and never written down |
 | A window that is still open | The stored result, 200 |
 | A window that has since closed | 409 [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) |
 

@@ -43,9 +43,9 @@ and writes one log line.
 
 ## Related codes
 
-- [`validation_failed`](/errors/validation_failed) — a field failed the schema.
-- [`unsupported_media_type`](/errors/unsupported_media_type) — the body was not JSON.
-- [`payload_too_large`](/errors/payload_too_large) — the body is over the ceiling.
+- [`validation_failed`](/errors/validation_failed) – a field failed the schema.
+- [`unsupported_media_type`](/errors/unsupported_media_type) – the body was not JSON.
+- [`payload_too_large`](/errors/payload_too_large) – the body is over the ceiling.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

@@ -1,6 +1,6 @@
 ---
 title: API keys and sessions
-description: The two ways a caller is identified — an API key and a dashboard session — what each may do, and why they are kept apart.
+description: The two ways a caller is identified – an API key and a dashboard session – what each may do, and why they are kept apart.
 type: explanation
 keyword: api key versus session auth
 nav: Keys and sessions

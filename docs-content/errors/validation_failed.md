@@ -46,8 +46,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`invalid_request`](/errors/invalid_request) — the request could not be read.
-- [`payload_too_large`](/errors/payload_too_large) — the body is over the ceiling.
+- [`invalid_request`](/errors/invalid_request) – the request could not be read.
+- [`payload_too_large`](/errors/payload_too_large) – the body is over the ceiling.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

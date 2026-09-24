@@ -21,8 +21,8 @@ limited number of documents and up to 10 requests per hour per IP.
 ## Try it in one call
 
 This runs as written. The image in it is a one-pixel placeholder, so the answer
-is a `200` reporting `no_document_found`. Put a base64-encoded photograph of a
-document in its place and the fields come back:
+is a `200` reporting `unsupported_document`, and it is not billed. Put a
+base64-encoded photograph of a document in its place and the fields come back:
 
 ```bash runnable
 curl -X POST https://api.doc.cheap/v1/scans \
@@ -38,24 +38,24 @@ that comes back.
 
 ## The four sections
 
-- [Get started](/start) — your first call, then a key of your own.
-- [Guides](/guides) — one page per task, from recognizing a passport to
+- [Get started](/start) – your first call, then a key of your own.
+- [Guides](/guides) – one page per task, from recognizing a passport to
   tracking what you spend.
-- [Reference](/reference) — the exact contract: endpoints, response shapes,
+- [Reference](/reference) – the exact contract: endpoints, response shapes,
   fields, options, errors and limits.
-- [Concepts](/concepts) — why the API behaves the way it does.
+- [Concepts](/concepts) – why the API behaves the way it does.
 
 ## Start here
 
-- [Your first recognition](/start/first-recognition) — one call, and what comes
+- [Your first recognition](/start/first-recognition) – one call, and what comes
   back.
-- [What a billed scan is](/concepts/what-a-billed-scan-is) — the rule that
+- [What a billed scan is](/concepts/what-a-billed-scan-is) – the rule that
   decides whether a call is charged at all.
-- [Recognize a passport](/guides/recognize-a-passport) — the full request,
+- [Recognize a passport](/guides/recognize-a-passport) – the full request,
   every option, and how to read the result.
-- [Errors](/reference/errors) — one page per error code, with the cause and the
+- [Errors](/reference/errors) – one page per error code, with the cause and the
   fix.
-- [Changelog](/changelog) — dated list of changes, with a feed.
+- [Changelog](/changelog) – dated list of changes, with a feed.
 
 ## For AI coding agents
 

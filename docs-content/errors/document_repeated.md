@@ -46,8 +46,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`rate_limited`](/errors/rate_limited) — over the rate limit.
-- [`registration_required`](/errors/registration_required) — the anonymous allowance is spent.
+- [`rate_limited`](/errors/rate_limited) – over the rate limit.
+- [`registration_required`](/errors/registration_required) – the anonymous allowance is spent.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

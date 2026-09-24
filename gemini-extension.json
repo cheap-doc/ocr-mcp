@@ -1,6 +1,6 @@
 {
   "name": "doc-cheap",
-  "version": "0.3.3",
+  "version": "0.3.5",
   "mcpServers": {
     "doc-cheap": {
       "command": "npx",

@@ -132,7 +132,7 @@ the balance is untouched. The caller gets an error, and the failure is free.
 
 Failures in front of the engine are free for a simpler reason: the engine
 never ran. A refused key, a body over the ceiling, an exhausted allowance, a
-rate limit — each of them is decided before any recognition capacity is spent.
+rate limit – each of them is decided before any recognition capacity is spent.
 
 The gates that protect the free sandbox fail **closed**. When the store
 holding their counters is unreachable, the anonymous path answers a retryable

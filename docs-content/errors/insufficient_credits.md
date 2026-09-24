@@ -29,7 +29,7 @@ The balance is too low to run this scan; top up to continue.
 ## The fix
 
 Top up, then retry. `GET /v1/usage` reports the balance, and the balance is
-also the number of documents left — one credit is one US cent, and one
+also the number of documents left – one credit is one US cent, and one
 recognized document draws one.
 
 ## event_id
@@ -40,8 +40,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`registration_required`](/errors/registration_required) — the anonymous allowance is spent.
-- [`topup_in_progress`](/errors/topup_in_progress) — a top-up is open and part-paid.
+- [`registration_required`](/errors/registration_required) – the anonymous allowance is spent.
+- [`topup_in_progress`](/errors/topup_in_progress) – a top-up is open and part-paid.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

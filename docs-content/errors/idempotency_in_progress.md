@@ -39,8 +39,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`idempotency_conflict`](/errors/idempotency_conflict) — the key was used with another body.
-- [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) — nothing left to replay.
+- [`idempotency_conflict`](/errors/idempotency_conflict) – the key was used with another body.
+- [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) – nothing left to replay.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

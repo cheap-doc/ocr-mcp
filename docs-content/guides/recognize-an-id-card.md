@@ -138,8 +138,8 @@ A merge that works for most integrations takes three rules.
 
 1. Take the identity values from the side whose zone passed. The zone is
    printed to be read by a machine and carries its own check digits.
-2. Take everything the zone does not encode — the address, the place of birth,
-   the authority — from the side that printed it.
+2. Take everything the zone does not encode – the address, the place of birth,
+   the authority – from the side that printed it.
 3. Compare the values both sides carry. A surname that differs between the two
    sides is a document to look at by hand, not a value to pick from.
 
@@ -166,11 +166,11 @@ nothing more.
 
 `meta.status` says how far the engine got on the side it was given.
 
-- `no_document_found` — nothing in the frame was located. Re-photograph that
+- `no_document_found` – nothing in the frame was located. Re-photograph that
   side and send it again.
-- `unreadable` — the type was determined and no source could be read. Usually
+- `unreadable` – the type was determined and no source could be read. Usually
   glare, blur or a crop that cut the zone.
-- `unsupported_document` — the card is a type the engine does not read. The
+- `unsupported_document` – the card is a type the engine does not read. The
   other side will not help.
 
 Retry the one side that failed. Keep the result you already have for the other,
@@ -197,9 +197,9 @@ first. Give each side its own key:
 
 ## Next
 
-- [Check an MRZ](/guides/check-an-mrz) — re-run the check digits of the zone
+- [Check an MRZ](/guides/check-an-mrz) – re-run the check digits of the zone
   the back gave you.
-- [Handle non-Latin scripts](/guides/handle-non-latin-scripts) — reading a card
+- [Handle non-Latin scripts](/guides/handle-non-latin-scripts) – reading a card
   that prints the name twice.
-- [MRZ reference](/reference/mrz) — the three formats and how the digits are
+- [MRZ reference](/reference/mrz) – the three formats and how the digits are
   reported.

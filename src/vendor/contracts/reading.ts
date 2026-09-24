@@ -31,7 +31,7 @@ export type ScanStatus = z.infer<typeof ScanStatus>;
 const SCAN_ID_DESCRIPTION =
   "Scan identifier: a UUID version 7 (RFC 9562), canonical lower-case " +
   "`8-4-4-4-12`. Its leading 48 bits are the millisecond the scan was made, so " +
-  "ids sort in the order the scans happened — but treat the value as opaque: " +
+  "ids sort in the order the scans happened – but treat the value as opaque: " +
   "nothing else about it is part of the contract.";
 const SCAN_ID_EXAMPLE = "01a0af18-cd8d-7a61-9f2d-4c7b8e105da3";
 
@@ -228,7 +228,7 @@ export const FieldComparison = z.enum(["match", "mismatch", "not_checked"]).meta
   id: "FieldComparison",
   description:
     "Cross-source agreement for a field: `match` (every source that carries it agrees), " +
-    "`mismatch` (they disagree — inspect the values), or `not_checked` (only one source).",
+    "`mismatch` (they disagree – inspect the values), or `not_checked` (only one source).",
 });
 export type FieldComparison = z.infer<typeof FieldComparison>;
 
@@ -309,11 +309,11 @@ export const ScanTiming = z
           "and validated, with your key resolved and its rate limit checked. The " +
           "allowance, idempotency and credit gates are claimed after this number is " +
           "taken, so they are not in it. Dominated by your own connection and by how " +
-          "large the image is — this is the half you can shrink, by sending a smaller " +
+          "large the image is – this is the half you can shrink, by sending a smaller " +
           "picture from closer by.",
       }),
     processing_ms: z.number().int().min(0).meta({
-      description: "The recognition itself — the server-side engine call.",
+      description: "The recognition itself – the server-side engine call.",
     }),
     total_ms: z
       .number()
@@ -323,8 +323,8 @@ export const ScanTiming = z
         description:
           "From the request arriving to the result being complete. At least " +
           "`upload_ms + processing_ms`; the remainder is the gates that run after " +
-          "`upload_ms` is taken — the allowance, the idempotency check and the credit " +
-          "hold — plus preparing the result images and mapping the engine's output " +
+          "`upload_ms` is taken – the allowance, the idempotency check and the credit " +
+          "hold – plus preparing the result images and mapping the engine's output " +
           "into this body. It stops there: writing the history row and serializing the " +
           "response happen after the number is fixed, so the same figure is stored and " +
           "returned.",
@@ -350,7 +350,7 @@ export const ReadingMrz = z
   .object({
     lines: z.array(z.string()).meta({
       description:
-        "The zone's lines in order, exactly as read — two for a TD3 passport, " +
+        "The zone's lines in order, exactly as read – two for a TD3 passport, " +
         "three for a TD1 card. The zone's alphabet is `A-Z`, `0-9` and the " +
         "filler `<`, so a line carries no whitespace.",
     }),
@@ -392,7 +392,7 @@ export const ScanReading = z
       .min(0)
       .meta({
         description:
-          "Server-side processing time of the scan in milliseconds — the same number as " +
+          "Server-side processing time of the scan in milliseconds – the same number as " +
           "`timing.processing_ms`, kept for callers written against it.",
       }),
     timing: ScanTiming.nullable(),
@@ -406,7 +406,7 @@ export const ScanReading = z
     warnings: z.array(ReadingWarning),
     fields: z.array(ExtractedField).meta({
       description:
-        "Every field the engine extracted, from every source and every script — the " +
+        "Every field the engine extracted, from every source and every script – the " +
         "exhaustive view behind the curated blocks above. Always present; empty when " +
         "nothing was extracted.",
     }),

@@ -177,7 +177,7 @@ Its summary line names the scan id, the status, the document kind and country,
 the holder, whether the call was billed, and the recognition time.
 
 ```text
-Scan 01a0af18-cd8d-7a61-9f2d-4c7b8e105da3 · recognized · passport (GRC) · PARADEIGMA ELENI SOFIA · billed · 684 ms
+Scan 01a0af18-cd8d-7a61-9f2d-4c7b8e105da3: recognized · passport (GRC) · PARADEIGMA ELENI SOFIA · billed · 684 ms
 ```
 
 A recognized document draws one credit, $0.01. A scan that recognized nothing
@@ -299,9 +299,9 @@ diagnostic to standard error, because standard output belongs to the protocol.
 
 ## Next
 
-- [Recognize a passport](/guides/recognize-a-passport) — what the tool's result
+- [Recognize a passport](/guides/recognize-a-passport) – what the tool's result
   carries.
-- [Track usage and spend](/guides/track-usage-and-spend) — the figures
+- [Track usage and spend](/guides/track-usage-and-spend) – the figures
   `check_balance` reads.
-- [API keys and sessions](/concepts/api-keys-and-sessions) — which key to give
+- [API keys and sessions](/concepts/api-keys-and-sessions) – which key to give
   it.

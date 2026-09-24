@@ -131,9 +131,9 @@ Upload the documents that actually give you trouble: the worn ones, the ones
 photographed at an angle, the issuers you have most of. Then read three fields
 in the result.
 
-- `meta.status` — whether the engine got far enough to return data.
-- `meta.billed` — whether a live key would have been charged for it.
-- `mrz.status` — `passed`, `failed` or `absent`, which is the difference
+- `meta.status` – whether the engine got far enough to return data.
+- `meta.billed` – whether a live key would have been charged for it.
+- `mrz.status` – `passed`, `failed` or `absent`, which is the difference
   between a document that vouches for itself and one you must check by hand.
 
 A sandbox key answers from a fixed synthetic specimen, so run this judgement on
@@ -141,9 +141,9 @@ the public sandbox key or a live one.
 
 ## Next
 
-- [Your first recognition](/start/first-recognition) — the same task in code,
+- [Your first recognition](/start/first-recognition) – the same task in code,
   field by field.
-- [Recognize a passport](/guides/recognize-a-passport) — the options and the
+- [Recognize a passport](/guides/recognize-a-passport) – the options and the
   layouts.
-- [Control history retention](/guides/control-history-retention) — what the
+- [Control history retention](/guides/control-history-retention) – what the
   account setting the upload inherits actually does.

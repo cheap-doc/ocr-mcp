@@ -65,8 +65,8 @@ export const ScanField = z
         description:
           "Identity of this entry, unique across `fields`: the key and the language " +
           "identifier the value was read as, plus an occurrence counter when the same " +
-          "pair is reported twice. `name` is the semantic key and repeats — a " +
-          "document that carries a field in two scripts yields one entry per language — " +
+          "pair is reported twice. `name` is the semantic key and repeats – a " +
+          "document that carries a field in two scripts yields one entry per language – " +
           "so use `id`, not `name`, to address or key a single entry.",
         example: "surname@1032",
       }),
@@ -137,7 +137,7 @@ export const ScanDocument = z
     }),
     issuing_state: CountryCode.nullable().meta({
       description:
-        "The issuing state, ISO 3166-1 alpha-3 — the same reading as `country`, under the " +
+        "The issuing state, ISO 3166-1 alpha-3 – the same reading as `country`, under the " +
         "name the machine-readable zone gives it.",
     }),
     type_name: z
@@ -207,7 +207,7 @@ export const ScanHolder = z
       .meta({
         description:
           "The holder's name as the document prints it in one combined field. Null when the " +
-          "document carries no such field — it is not composed from the two above.",
+          "document carries no such field – it is not composed from the two above.",
       }),
     birth_date: IsoDate.nullable().meta({
       description: "The holder's date of birth, ISO-8601 (`YYYY-MM-DD`). Null when none was read.",
@@ -258,7 +258,7 @@ export const ScanMrz = z
       .nullable()
       .meta({
         description:
-          "The zone's lines in order, exactly as read — two for a TD3 passport, three " +
+          "The zone's lines in order, exactly as read – two for a TD3 passport, three " +
           "for a TD1 card. The zone's alphabet is `A-Z`, `0-9` and the filler `<`, so " +
           "a line carries no whitespace. Null when the document carries none.",
       }),
@@ -278,7 +278,7 @@ export const ScanImages = z
   .object({
     document_crop: DataImageUrl.nullable().meta({
       description:
-        "The document itself, cropped out of the uploaded picture and deskewed — the " +
+        "The document itself, cropped out of the uploaded picture and deskewed – the " +
         "front side of a card, the data page of a booklet.",
     }),
     rear: DataImageUrl.nullable().meta({
@@ -295,7 +295,7 @@ export const ScanImages = z
     watermark_face: DataImageUrl.nullable().meta({
       description:
         "The faint second copy of the holder's face printed into the page as a security " +
-        "feature — a different image from `main_photo`, and the one a verifier compares " +
+        "feature – a different image from `main_photo`, and the one a verifier compares " +
         "against it. Null when the document carries none.",
     }),
     barcode: DataImageUrl.nullable().meta({
@@ -346,7 +346,7 @@ export const ScanQuality = z
     overall: z.enum(["not_checked", "pass", "warn", "fail"]).meta({
       description:
         "Whether the uploaded picture was good enough to recognize from. " +
-        "`not_checked` when nothing measured it — a scan read back from storage, " +
+        "`not_checked` when nothing measured it – a scan read back from storage, " +
         "which keeps no engine output.",
     }),
   })
@@ -376,7 +376,7 @@ export const Scan = z
     fields: z.array(ScanField).meta({
       description:
         "Every field the engine extracted off the printed document, re-keyed to our " +
-        "vocabulary — the open set. Always present; empty when nothing was extracted. A " +
+        "vocabulary – the open set. Always present; empty when nothing was extracted. A " +
         "field read in more than one language appears once per language, so `name` repeats " +
         "and only `id` is unique.",
     }),

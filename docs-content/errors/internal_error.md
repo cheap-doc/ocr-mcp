@@ -33,7 +33,7 @@ The response could not be produced.
 
 ## The fix
 
-Retry once — most are transient. Quote the `event_id` if the response carries
+Retry once – most are transient. Quote the `event_id` if the response carries
 one, and the `request_id` otherwise, when you report it.
 
 Nothing is charged for a scan that ended here: the reservation is released
@@ -47,8 +47,8 @@ it resolves to that one failure.
 
 ## Related codes
 
-- [`service_unavailable`](/errors/service_unavailable) — a dependency is unreachable.
-- [`engine_unavailable`](/errors/engine_unavailable) — the engine did not answer.
+- [`service_unavailable`](/errors/service_unavailable) – a dependency is unreachable.
+- [`engine_unavailable`](/errors/engine_unavailable) – the engine did not answer.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

@@ -39,7 +39,7 @@ and writes one log line.
 
 ## Related codes
 
-- [`unauthorized`](/errors/unauthorized) — no usable API key.
+- [`unauthorized`](/errors/unauthorized) – no usable API key.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

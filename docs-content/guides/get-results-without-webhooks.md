@@ -184,9 +184,9 @@ worker received.
 Two codes say the service cannot run your scan right now, and both carry
 `Retry-After`.
 
-- [`engine_unavailable`](/errors/engine_unavailable) — recognition is not
+- [`engine_unavailable`](/errors/engine_unavailable) – recognition is not
   reachable. Nothing was charged.
-- [`service_unavailable`](/errors/service_unavailable) — a store the request
+- [`service_unavailable`](/errors/service_unavailable) – a store the request
   needed is unreachable.
 
 Requeue the job rather than failing it to your user. The decision table over
@@ -194,9 +194,9 @@ all 21 codes is on [handle errors](/guides/handle-errors).
 
 ## Next
 
-- [Retry safely with idempotency](/guides/retry-safely-with-idempotency) — a
+- [Retry safely with idempotency](/guides/retry-safely-with-idempotency) – a
   retry that cannot charge twice.
-- [Service levels](/reference/service-levels) — what the published percentiles
+- [Service levels](/reference/service-levels) – what the published percentiles
   are a percentile of.
-- [Reliability](/concepts/reliability) — what is measured, and what is
+- [Reliability](/concepts/reliability) – what is measured, and what is
   promised.

@@ -38,8 +38,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`idempotency_in_progress`](/errors/idempotency_in_progress) — the first request is still running.
-- [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) — nothing left to replay.
+- [`idempotency_in_progress`](/errors/idempotency_in_progress) – the first request is still running.
+- [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) – nothing left to replay.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

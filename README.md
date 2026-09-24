@@ -1,12 +1,17 @@
-# doc.cheap MCP server — passport, ID card and MRZ OCR for AI agents
+# doc.cheap MCP server – passport, ID card and MRZ OCR for AI agents
+
+[![MCP Registry](https://img.shields.io/badge/MCP_Registry-cheap.doc%2Fmcp-0f172a)](https://registry.modelcontextprotocol.io/v0.1/servers?search=cheap.doc)
+[![Smithery](https://img.shields.io/badge/Smithery-doc--cheap%2Focr--mcp-0f172a)](https://smithery.ai/servers/doc-cheap/ocr-mcp)
+[![cursor.directory](https://img.shields.io/badge/cursor.directory-doc.cheap-0f172a)](https://cursor.directory/plugins/doccheap-passport-id-ocr)
+[![npm](https://img.shields.io/npm/v/@doc-cheap/mcp)](https://www.npmjs.com/package/@doc-cheap/mcp)
 
 Give your assistant a passport, national ID card or driver's licence and get the
-printed fields back as structured JSON — **$0.01 per recognised document**, and
+printed fields back as structured JSON – **$0.01 per recognised document**, and
 free to try before you register. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits.
 
 An [MCP](https://modelcontextprotocol.io) server over stdio, for Claude Desktop,
 Claude Code, Cursor, VS Code, Gemini CLI, Windsurf, Kiro and any other MCP
-client — and the same server hosted at `https://mcp.doc.cheap/mcp` for clients
+client – and the same server hosted at `https://mcp.doc.cheap/mcp` for clients
 that connect to a URL instead. It is a thin client of the public doc.cheap HTTP
 API and a copy of the documentation: it holds no data of its own.
 
@@ -14,11 +19,11 @@ API and a copy of the documentation: it holds no data of its own.
 npx -y @doc-cheap/mcp
 ```
 
-## Hosted — nothing to install
+## Hosted – nothing to install
 
 `https://mcp.doc.cheap/mcp` serves the same three tools over Streamable HTTP. No
 login: send your key as `X-Doc-Cheap-Api-Key: sk_live_your_key` or
-`Authorization: Bearer sk_live_your_key` — the named header wins when both are
+`Authorization: Bearer sk_live_your_key` – the named header wins when both are
 sent, and an `Authorization` that is not a doc.cheap key is ignored rather than
 passed on. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits. The
 hosted server cannot read files on your machine, so `scan_document` takes the
@@ -73,7 +78,7 @@ VS Code, `.vscode/mcp.json` (the key is asked for once and stored by VS Code):
 
 Set `DOC_CHEAP_API_KEY` to your key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits. The sandbox key has no balance.
 
-### Claude Desktop — one-click extension
+### Claude Desktop – one-click extension
 
 Download `doc-cheap-<version>.mcpb` from the
 [latest release](https://gitlab.com/doccheap/ocr-mcp/-/releases) and open it, or
@@ -83,7 +88,7 @@ and the one folder `image_path` may read images from (leave it empty and no
 local file is read). Node.js ships with Claude Desktop, so nothing else needs
 installing.
 
-### Claude Desktop — by hand
+### Claude Desktop – by hand
 
 `claude_desktop_config.json`:
 
@@ -196,7 +201,7 @@ CLI extension without writing settings by hand.
 }
 ```
 
-Kiro also installs from a one-click link, which writes that block for you —
+Kiro also installs from a one-click link, which writes that block for you –
 it asks for confirmation first and shows the command and argument list it is
 about to add:
 
@@ -238,14 +243,14 @@ plus the optional `expect_country`, `return_portrait`, `retain_hours`,
 }
 ```
 
-It answers with the whole `Scan` as structured JSON — `meta` (id, status,
+It answers with the whole `Scan` as structured JSON – `meta` (id, status,
 `billed`, confidence, timing), `document` (kind, issuing country, number,
 series, date of issue, date of expiry, whether it has expired and how many days
 are left), `holder` (given names, surname, date of
 birth, sex, nationality), `fields` (every field read off the printed page, each
 with its own confidence), `mrz` (whether the machine-readable zone checks out,
 why not when it does not, and its lines exactly as read), `images`, `quality`
-and `authenticity` — and a one-line summary of the same result:
+and `authenticity` – and a one-line summary of the same result:
 
 ```text
 Scan 01a0af18-cd8d-7a61-9f2d-4c7b8e105da3 · recognized · passport (GRC) · PARADEIGMA ELENI SOFIA · billed · 684 ms
@@ -273,8 +278,8 @@ Balance: 1840 credits · 63 scans this period (58 billed, 58 credits spent).
 { "query": "mrz check digit", "limit": 5 }
 ```
 
-Full-text search over the documentation — endpoints, response fields, error
-codes, MRZ rules, retention, pricing — returning the matching sections with
+Full-text search over the documentation – endpoints, response fields, error
+codes, MRZ rules, retention, pricing – returning the matching sections with
 titles, snippets and links. It reads a copy shipped inside this package, so it
 makes no network call.
 
@@ -337,7 +342,7 @@ not the image itself are fenced in:
   link-local addresses are refused, as are the IPv4-mapped IPv6 spellings of
   them. Redirects are followed by hand, at most three hops, and every hop is
   re-checked, so a public URL cannot hand off to a private one. The body is
-  capped at 25 MB — the API refuses more anyway.
+  capped at 25 MB – the API refuses more anyway.
 - **`image_base64`** has no such constraints: the caller already holds the
   bytes. It is the fallback every refusal above points at.
 
@@ -350,20 +355,20 @@ When it calls the doc.cheap API it identifies itself in the request's
 `User-Agent`, the way any HTTP client does:
 
 ```
-doc-cheap-mcp/0.3.3 (claude-code/1.4.2)
+doc-cheap-mcp/0.3.5 (claude-code/1.4.2)
 ```
 
 The first half is this package and its version. The second half is **the name
-and version your MCP client reports over the protocol** — the editor or
-assistant you launched it from — normalised to a short label, plus the same
+and version your MCP client reports over the protocol** – the editor or
+assistant you launched it from – normalised to a short label, plus the same
 label on a `baggage` header. It is used for one thing: counting how much this
 server is used and from which applications, so that the work goes where people
 actually are. It is never used to change what the server does, and nothing else
 about you, your prompts, your files or your images travels with it.
 
 **Switching it off:** set `DO_NOT_TRACK=1` in the server's environment. The
-request then carries `doc-cheap-mcp/0.3.3` and nothing more — no client name, no
-client version, no `baggage` header — and everything else works identically.
+request then carries `doc-cheap-mcp/0.3.5` and nothing more – no client name, no
+client version, no `baggage` header – and everything else works identically.
 
 Your API key already identifies your account to the API; that is what a key is
 for, and it is unaffected by the setting above.
@@ -373,12 +378,12 @@ for, and it is unaffected by the setting above.
 The full policy is <https://doc.cheap/privacy>. What it says about this server:
 
 - **What is collected.** The image you ask it to read, sent to the doc.cheap API
-  (`https://api.doc.cheap`) — nowhere else. Its calls also name this package and
+  (`https://api.doc.cheap`) – nowhere else. Its calls also name this package and
   version, and the client you run it in (see the section above; `DO_NOT_TRACK=1`
   removes the client). Your key identifies your account to the API.
 - **How it is used and stored.** The image is read and never stored: it lives
-  in memory for the length of the request. The **result** — the fields read off
-  the document — is kept for the window the call asked for in `retain_hours`
+  in memory for the length of the request. The **result** – the fields read off
+  the document – is kept for the window the call asked for in `retain_hours`
   (`0` stores nothing) or, when it asked for none, for the account's
   history-retention setting, which defaults to one year; expiry deletes it.
 - **Who else sees it.** Nobody the policy does not name: the hosting provider
@@ -391,7 +396,7 @@ The full policy is <https://doc.cheap/privacy>. What it says about this server:
 
 The hosted server keeps nothing either. Its log records which method and which
 tool a request called, how long it took and whether a key of your own was
-used — never the image, the result, the key or your address.
+used – never the image, the result, the key or your address.
 
 ## Run it from source
 
@@ -413,7 +418,7 @@ a shebang and copies the documentation content next to it, so the `bin`
 
 ## Licence
 
-MIT — see [LICENSE](https://gitlab.com/doccheap/ocr-mcp/-/blob/main/LICENSE). The monorepo this server is developed in is
+MIT – see [LICENSE](https://gitlab.com/doccheap/ocr-mcp/-/blob/main/LICENSE). The monorepo this server is developed in is
 UNLICENSED; this package alone is published, and it is published under MIT.
 
 ## Links

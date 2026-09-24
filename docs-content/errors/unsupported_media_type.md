@@ -34,10 +34,17 @@ For the content type:
 Send the request body as `Content-Type: application/json`.
 ```
 
-For the image:
+For an image that is not a JPEG or PNG:
 
 ```text
 The image is not a JPEG or PNG file. Send the document photo as JPEG or PNG, base64-encoded in the `image` field.
+```
+
+For an image that starts like a JPEG or PNG and cannot be decoded, such as a
+file cut short:
+
+```text
+The image could not be read as a JPEG or PNG file; it may be cut short or damaged. Send the document photo again as JPEG or PNG.
 ```
 
 ## The fix
@@ -54,8 +61,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`invalid_request`](/errors/invalid_request) — the request could not be read.
-- [`payload_too_large`](/errors/payload_too_large) — the body is over the ceiling.
+- [`invalid_request`](/errors/invalid_request) – the request could not be read.
+- [`payload_too_large`](/errors/payload_too_large) – the body is over the ceiling.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

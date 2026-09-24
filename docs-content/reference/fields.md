@@ -132,7 +132,7 @@ decision, and each has a reason a reader can check.
 | Withheld | Why |
 |---|---|
 | `0`, the document class code | The one-letter class designation, `P` on a passport. `document.kind` publishes the same fact in words, so the letter would make a reader carry a code table to learn what the result already told them |
-| `364`, the remainder term | A countdown to expiry in whole **months**, derived by the engine from the expiry date it already reports. Among a row of dates, a bare number reads as days — wrong by a factor of about thirty, with nothing to signal it. The same fact is published as `days_to_expire`, in the unit its label promises |
+| `364`, the remainder term | A countdown to expiry in whole **months**, derived by the engine from the expiry date it already reports. Among a row of dates, a bare number reads as days – wrong by a factor of about thirty, with nothing to signal it. The same fact is published as `days_to_expire`, in the unit its label promises |
 
 Neither exclusion loses a fact. Both replace a reading that would be read
 wrongly with one that says the same thing unambiguously.

@@ -193,8 +193,8 @@ on a date you chose is one you cannot forget to withdraw.
 
 ## Next
 
-- [API keys and sessions](/concepts/api-keys-and-sessions) — the three kinds of
+- [API keys and sessions](/concepts/api-keys-and-sessions) – the three kinds of
   key and why they are kept apart.
-- [Handle errors](/guides/handle-errors) — what to branch on when a call is
+- [Handle errors](/guides/handle-errors) – what to branch on when a call is
   refused.
-- [Limits](/reference/limits) — the rate a registered key is allowed.
+- [Limits](/reference/limits) – the rate a registered key is allowed.

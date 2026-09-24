@@ -23,7 +23,7 @@ identifier it can be resolved from.
 | Key | Carries |
 |---|---|
 | `fields[].language` | The language name, for example `Greek`; `null` for the neutral Latin reading |
-| `fields[].id` | `name@lcid` — the numeric identifier is the part after the `@` |
+| `fields[].id` | `name@lcid` – the numeric identifier is the part after the `@` |
 
 The response carries the same fact twice, deliberately. `language` is the name
 the identifier resolves to, which is what a reader renders. The identifier
@@ -39,7 +39,7 @@ distinguishable however their names are spelled.
 
 ## The neutral identifier
 
-`0` is not a language. It is the neutral, transliterated Latin reading — the
+`0` is not a language. It is the neutral, transliterated Latin reading – the
 value the engine merged across sources, spelled in the alphabet the
 machine-readable zone uses.
 
@@ -56,7 +56,7 @@ them.
 1. **The identifier itself.** A value present in the table below resolves to
    its language, its full name and its IETF tag. `1032` is Greek.
 2. **The primary language.** Failing that, the low 10 bits of the value name a
-   primary language, and the rest select a sublanguage — a region or a script.
+   primary language, and the rest select a sublanguage – a region or a script.
    A sublanguage nobody has assigned still belongs to its language, and saying
    so is true. 135 primary languages are tabulated for this step.
 3. **A literal.** When even the family is unknown, the answer is
@@ -105,8 +105,8 @@ The language on an entry decides which spelling its `value` carries.
 | `null` | The merged Latin value: the transliterated spelling |
 | A language name | The national-script spelling, as printed |
 
-A reading whose national-script spelling matches its transliterated one — a
-document printed only in Latin — produces one entry, not two.
+A reading whose national-script spelling matches its transliterated one – a
+document printed only in Latin – produces one entry, not two.
 
 ## The identifiers a document most often carries
 
