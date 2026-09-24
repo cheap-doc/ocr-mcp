@@ -1,6 +1,6 @@
 ---
 title: The response
-description: The recognition result, group by group — every key, its type, when it is null, and what each value is derived from.
+description: The recognition result, group by group – every key, its type, when it is null, and what each value is derived from.
 type: reference
 keyword: document recognition api response
 nav: The response
@@ -15,7 +15,7 @@ for a stored scan. Every scan answers in this one shape.
 
 The body answers the question a caller has: what does this document say, and can
 it be trusted. It does not hand over the recognition engine's working notes.
-Every value is a conclusion — one value per reading, a confidence band, and a
+Every value is a conclusion – one value per reading, a confidence band, and a
 single verdict on the machine-readable zone.
 
 **Every key is present.** A value that is not known is `null`, never a missing
@@ -243,8 +243,8 @@ published, with a slugged key and the category `other`.
 | `confidence` | band | How strongly this reading is backed |
 
 **`name` repeats; `id` does not.** A document that prints a field in two scripts
-yields one entry per script, all under the same `name`. `id` is `name@lcid` —
-the key, an `@`, and the numeric language identifier — with `#2`, `#3` appended
+yields one entry per script, all under the same `name`. `id` is `name@lcid` –
+the key, an `@`, and the numeric language identifier – with `#2`, `#3` appended
 when the same pair appears twice.
 
 The whole catalogue, the open-set rule and the two field types withheld on
@@ -388,7 +388,7 @@ Four rules cover the shapes a consumer meets.
 
 ## Related
 
-- [Scan options](/reference/scan-options) — what a request can set.
-- [POST /v1/scans](/reference/endpoints/create-a-scan) — the endpoint, its
+- [Scan options](/reference/scan-options) – what a request can set.
+- [POST /v1/scans](/reference/endpoints/create-a-scan) – the endpoint, its
   headers and every status it answers with.
-- [Versioning](/reference/versioning) — what the version covers.
+- [Versioning](/reference/versioning) – what the version covers.

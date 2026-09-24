@@ -78,7 +78,7 @@ This is why an entry's `id` and not its `name` is the unique value. `name`
 repeats across the readings of one field, on purpose, and a consumer keying on
 it keeps whichever arrived last.
 
-The curated blocks beside the list — `holder` and `document` — carry one value
+The curated blocks beside the list – `holder` and `document` – carry one value
 each, in Latin. A great many consumers want exactly that, and should not have
 to walk a list to get it. The list is there when the choice matters.
 

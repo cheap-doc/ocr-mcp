@@ -21,7 +21,7 @@ what a proxy, a load balancer and a metrics dashboard read.
 
 | Status | Codes | Retry? |
 |---|---|---|
-| 200 | — | Not an error; `meta.status` says how far recognition got |
+| 200 | – | Not an error; `meta.status` says how far recognition got |
 | 400 | [`invalid_request`](/errors/invalid_request) | No, until the request changes |
 | 401 | [`unauthorized`](/errors/unauthorized) | No |
 | 402 | [`insufficient_credits`](/errors/insufficient_credits) | After a top-up |

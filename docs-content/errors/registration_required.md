@@ -44,9 +44,9 @@ and writes one log line.
 
 ## Related codes
 
-- [`unauthorized`](/errors/unauthorized) — no usable API key.
-- [`rate_limited`](/errors/rate_limited) — over the rate limit.
-- [`document_repeated`](/errors/document_repeated) — the same image, too many times.
+- [`unauthorized`](/errors/unauthorized) – no usable API key.
+- [`rate_limited`](/errors/rate_limited) – over the rate limit.
+- [`document_repeated`](/errors/document_repeated) – the same image, too many times.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

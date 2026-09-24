@@ -114,7 +114,7 @@ is](/concepts/what-a-billed-scan-is).
 
 The result is written down in the same transaction as that ledger move, when
 the retention window resolved for the request is above zero. When the window
-is zero, no row is written at all — not a row that expires early, no row.
+is zero, no row is written at all – not a row that expires early, no row.
 
 The uploaded image is not part of any of that. It was decoded in memory,
 handed to the engine, and is gone when the request ends.

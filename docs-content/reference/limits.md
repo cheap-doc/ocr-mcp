@@ -46,7 +46,7 @@ Two separate allowances govern the public sandbox key, and both apply.
 | The same image, on the free sandbox | 5 submissions per hour | 429 [`document_repeated`](/errors/document_repeated) |
 
 The repeat guard keeps only a digest of the image bytes, and only for the window
-— neither the image nor a durable record of it. It runs before the engine, so a
+– neither the image nor a durable record of it. It runs before the engine, so a
 refused repeat costs neither recognition time nor one of the free attempts.
 
 A registered account arrives with 20 free documents credited to its balance, and
@@ -132,7 +132,7 @@ answering.
 | The repeat-document threshold and window | Yes |
 | The request body ceiling | Yes |
 | The engine deadline and the idempotency waits | Yes |
-| `retain_hours`' range, `reference`'s length, the key's length | **No** — they are the contract |
+| `retain_hours`' range, `reference`'s length, the key's length | **No** – they are the contract |
 | The image height caps | **No** |
 
 A deployment that changes a configurable figure changes what its own API

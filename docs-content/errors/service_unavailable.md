@@ -45,9 +45,9 @@ holds. The rate is what is recorded, not each request.
 
 ## Related codes
 
-- [`engine_unavailable`](/errors/engine_unavailable) — the engine did not answer.
-- [`maintenance`](/errors/maintenance) — a planned window is open.
-- [`internal_error`](/errors/internal_error) — the service failed unexpectedly.
+- [`engine_unavailable`](/errors/engine_unavailable) – the engine did not answer.
+- [`maintenance`](/errors/maintenance) – a planned window is open.
+- [`internal_error`](/errors/internal_error) – the service failed unexpectedly.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

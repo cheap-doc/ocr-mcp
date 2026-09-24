@@ -273,7 +273,7 @@ new setting governs the scans made after it.
 
 ## Next
 
-- [Data retention and privacy](/concepts/data-retention-and-privacy) — why the
+- [Data retention and privacy](/concepts/data-retention-and-privacy) – why the
   image is never stored.
-- [Scan options](/reference/scan-options) — every option and its default.
-- [Limits](/reference/limits) — the range `retain_hours` accepts.
+- [Scan options](/reference/scan-options) – every option and its default.
+- [Limits](/reference/limits) – the range `retain_hours` accepts.

@@ -20,7 +20,7 @@ You need three things.
 1. A photograph of a document, as JPEG or PNG. Save it as `document.jpg` in the
    directory you run the commands from. Your own passport works, and so does a
    specimen page from an issuer's website.
-2. curl, Node.js or Python 3 — whichever you already have.
+2. curl, Node.js or Python 3 – whichever you already have.
 3. The public sandbox key, `sk_sandbox_public`. It is published, it costs
    nothing, and it runs the same engine a paying call runs.
 
@@ -163,10 +163,11 @@ Three keys of `meta` say how the call went.
 
 - `status` is one of `recognized`, `no_document_found`, `unreadable`,
   `unsupported_document` and `rejected`. The set is exactly those five strings.
-- `billed` says whether this scan was charged. On either sandbox key it is
-  always `false`. On a live key it is `true` when the engine determined the
-  document type and read something usable from it.
-- `confidence` is `high`, `medium` or `low` — a band rather than a number,
+- `billed` says whether this scan is a billed one: `true` when the engine
+  determined the document type and read something usable from it. On a live
+  key that is a charge. On either sandbox key nothing is charged, and `billed`
+  says whether the same scan would have been charged on a live key.
+- `confidence` is `high`, `medium` or `low` – a band rather than a number,
   because a recognition probability is not a calibrated percentage.
 
 `recognized` and `billed` are not the same question, and a scan can be one
@@ -207,7 +208,7 @@ passport carries both `PARADEIGMA` and `ΠΑΡΑΔΕΙΓΜΑ`.
 `mrz` is a verdict with the zone beside it. `status` is `passed`, `failed` or
 `absent`; `reason` names what did not check out when it failed.
 
-`lines` is the lines in order, exactly as read — two for a passport, three for
+`lines` is the lines in order, exactly as read – two for a passport, three for
 an ID card. `text` is those lines run together with nothing between them: one
 unbroken string, with no newlines and no spaces. The zone's alphabet is `A-Z`,
 `0-9` and the filler `<`, so nothing is lost by joining them. Hand the value to
@@ -295,9 +296,9 @@ The public sandbox key carries no account, so `balance_credits` comes back
 
 ## Next
 
-- [From the sandbox to a live key](/start/from-sandbox-to-live) — what changes
+- [From the sandbox to a live key](/start/from-sandbox-to-live) – what changes
   when the call starts billing.
-- [Recognize a passport](/guides/recognize-a-passport) — the options, the ID
+- [Recognize a passport](/guides/recognize-a-passport) – the options, the ID
   card layouts and the two-sided case.
-- [Handle errors](/guides/handle-errors) — what to retry, what to fix and what
+- [Handle errors](/guides/handle-errors) – what to retry, what to fix and what
   to surface.

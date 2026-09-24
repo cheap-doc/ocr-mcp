@@ -23,7 +23,7 @@ scans.
 **Result.** The body a scan returns: eight groups, described key by key on
 [the response](/reference/response). One shape, whatever the outcome.
 
-**Reading.** One source's value for one field — the machine-readable zone's
+**Reading.** One source's value for one field – the machine-readable zone's
 spelling of a surname, or the printed page's. A document printed in two scripts
 produces two readings of the same field, and they may differ.
 
@@ -44,7 +44,7 @@ accepted, and not a synonym for **billed**.
 expressed as one of three words, cut at 90 and 60 out of 100. Never a number in
 the response.
 
-**Verdict.** A single conclusion drawn from several checks — `mrz.status` and
+**Verdict.** A single conclusion drawn from several checks – `mrz.status` and
 `quality.overall` are the two. A verdict names what failed where it can.
 
 ## The document
@@ -118,7 +118,7 @@ own setting when the request names none. Not a TTL, a storage period or an
 expiry.
 
 **Zero retention.** `retain_hours: 0`. No history row is written at all, so
-nothing exists that a later read could find — as against a row that expires
+nothing exists that a later read could find – as against a row that expires
 immediately.
 
 **Thumbnail.** A picture of at most 96 px that a retained scan keeps, readable
@@ -147,4 +147,4 @@ to look at. `null` on every error a caller is meant to handle. Opaque.
 echoed back on the result and on every history row. The service never reads it.
 
 **Engine.** The recognition engine behind the API. It is always "the Engine"
-here — never a vendor's name, a library or a model.
+here – never a vendor's name, a library or a model.

@@ -144,8 +144,8 @@ the aggregate.
 
 ## Next
 
-- [Top up with crypto](/guides/top-up-with-crypto) — putting credits on the
+- [Top up with crypto](/guides/top-up-with-crypto) – putting credits on the
   balance.
-- [What a billed scan is](/concepts/what-a-billed-scan-is) — the predicate
+- [What a billed scan is](/concepts/what-a-billed-scan-is) – the predicate
   behind `billed`.
-- [Limits](/reference/limits) — the rate this endpoint shares with the rest.
+- [Limits](/reference/limits) – the rate this endpoint shares with the rest.

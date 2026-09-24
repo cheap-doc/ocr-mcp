@@ -43,8 +43,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`idempotency_conflict`](/errors/idempotency_conflict) — the key was used with another body.
-- [`not_found`](/errors/not_found) — no scan, or no route.
+- [`idempotency_conflict`](/errors/idempotency_conflict) – the key was used with another body.
+- [`not_found`](/errors/not_found) – no scan, or no route.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

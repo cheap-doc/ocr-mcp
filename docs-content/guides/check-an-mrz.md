@@ -126,7 +126,7 @@ TD1 one.
 
 ## Check a zone without writing any code
 
-Paste the zone into the free MRZ checker at
+Paste the zone into the free MRZ parser at
 <https://doc.cheap/mrz-checker>. It runs every digit of the format it detects
 and shows each one computed beside the one the zone prints.
 
@@ -190,9 +190,9 @@ person to look at.
 
 ## Next
 
-- [MRZ reference](/reference/mrz) — the three formats, the fields each one
+- [MRZ reference](/reference/mrz) – the three formats, the fields each one
   fills and the shape of every verdict.
-- [The MRZ and the visual zone](/concepts/mrz-and-the-visual-zone) — why a
+- [The MRZ and the visual zone](/concepts/mrz-and-the-visual-zone) – why a
   document says the same thing twice.
-- [Recognize an ID card](/guides/recognize-an-id-card) — reading the zone off
+- [Recognize an ID card](/guides/recognize-an-id-card) – reading the zone off
   the back of a card.

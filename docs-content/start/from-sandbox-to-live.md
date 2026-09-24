@@ -61,7 +61,7 @@ meant to handle, not a failure we recorded. The
 ## 3. Register
 
 Create an account in the dashboard. The account is credited with 20 credits as
-it is created — 20 recognized documents, with no payment and no card.
+it is created – 20 recognized documents, with no payment and no card.
 
 ## 4. Take both keys
 
@@ -71,7 +71,7 @@ same thing.
 | Key | Runs recognition on your image | Charges the balance | Stores results |
 |---|---|---|---|
 | `sk_live_…` | Yes | Yes, 1 credit per billable scan | Yes, for the retention window |
-| `sk_sandbox_…` | No — answers from a fixed synthetic specimen | Never | No |
+| `sk_sandbox_…` | No – answers from a fixed synthetic specimen | Never | No |
 
 A registered sandbox key is the integration credential. Its answer is the same
 every time, so a client can be built against a stable result without spending
@@ -142,14 +142,15 @@ print(scan["meta"]["status"], scan["meta"]["billed"])
 
 Export `API_KEY` with your live key and run the same command again.
 
-## 6. Watch `billed` flip
+## 6. Watch what `billed` costs
 
-`billed` is the one field whose meaning depends on the key that made the call.
+`billed` means the same thing on every key: `true` when the engine determined
+the document type and read something usable off it, and `false` otherwise.
+What depends on the key is whether that costs anything.
 
-- On either sandbox key it is always `false`. Nothing was charged, because
-  neither key has a balance to charge.
-- On a live key it is `true` when the engine determined the document type and
-  read something usable off it, and `false` otherwise.
+- On either sandbox key nothing is charged, because neither key has a balance
+  to charge. `billed` still says whether the scan would have been charged.
+- On a live key a scan with `billed: true` draws one credit.
 
 `recognized` and `billed` answer different questions, and a page that treats
 them as one will bill you for the wrong things. Reconcile against `billed`.
@@ -220,9 +221,9 @@ called, so an empty balance costs nothing and breaks nothing.
 
 ## Next
 
-- [Handle errors](/guides/handle-errors) — the codes a live integration meets,
+- [Handle errors](/guides/handle-errors) – the codes a live integration meets,
   and what to do with each.
-- [Retry safely with idempotency](/guides/retry-safely-with-idempotency) — how
+- [Retry safely with idempotency](/guides/retry-safely-with-idempotency) – how
   to retry a billing call without paying twice.
-- [Control history retention](/guides/control-history-retention) — how long a
+- [Control history retention](/guides/control-history-retention) – how long a
   live key's results stay readable.

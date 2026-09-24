@@ -20,12 +20,12 @@ recognitions per client on top of that.
 
 ## The three lessons
 
-1. [Your first recognition](/start/first-recognition) — send one document, read
+1. [Your first recognition](/start/first-recognition) – send one document, read
    every field that comes back, and see what the call took. No account.
-2. [From the sandbox to a live key](/start/from-sandbox-to-live) — spend the
+2. [From the sandbox to a live key](/start/from-sandbox-to-live) – spend the
    free allowance, register, and point the same code at a key that bills. An
    account, and no money: registration comes with 20 credits.
-3. [Recognize a document without code](/start/recognize-without-code) — upload
+3. [Recognize a document without code](/start/recognize-without-code) – upload
    in the dashboard and read the result on screen. An account. No code at all.
 
 Start with the first if you are integrating, and with the third if you are
@@ -41,10 +41,10 @@ engine ran is never charged. The rule, and the cases around it, are on
 
 ## Where to go next
 
-- [Guides](/guides) — one page per task, from a passport to a driver licence to
+- [Guides](/guides) – one page per task, from a passport to a driver licence to
   retries.
-- [Reference](/reference) — the exact contract: endpoints, response shapes,
+- [Reference](/reference) – the exact contract: endpoints, response shapes,
   fields, options, errors and limits.
-- [Concepts](/concepts) — why the API behaves the way it does.
-- [Errors](/reference/errors) — one page per error code, with the cause and the
+- [Concepts](/concepts) – why the API behaves the way it does.
+- [Errors](/reference/errors) – one page per error code, with the cause and the
   fix.

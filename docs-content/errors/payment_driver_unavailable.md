@@ -43,8 +43,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`topup_in_progress`](/errors/topup_in_progress) — a top-up is open and part-paid.
-- [`rate_unavailable`](/errors/rate_unavailable) — no corroborated exchange rate.
+- [`topup_in_progress`](/errors/topup_in_progress) – a top-up is open and part-paid.
+- [`rate_unavailable`](/errors/rate_unavailable) – no corroborated exchange rate.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

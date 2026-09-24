@@ -45,8 +45,8 @@ holds. The rate is what is recorded, not each request.
 
 ## Related codes
 
-- [`topup_in_progress`](/errors/topup_in_progress) — a top-up is open and part-paid.
-- [`service_unavailable`](/errors/service_unavailable) — a dependency is unreachable.
+- [`topup_in_progress`](/errors/topup_in_progress) – a top-up is open and part-paid.
+- [`service_unavailable`](/errors/service_unavailable) – a dependency is unreachable.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

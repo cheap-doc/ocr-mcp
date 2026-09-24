@@ -43,8 +43,8 @@ holds. The rate is what is recorded, not each request.
 
 ## Related codes
 
-- [`service_unavailable`](/errors/service_unavailable) — a dependency is unreachable.
-- [`internal_error`](/errors/internal_error) — the service failed unexpectedly.
+- [`service_unavailable`](/errors/service_unavailable) – a dependency is unreachable.
+- [`internal_error`](/errors/internal_error) – the service failed unexpectedly.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

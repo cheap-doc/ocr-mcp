@@ -35,7 +35,7 @@ export const SERVER_INSTRUCTIONS =
   "This server recognises identity documents: give it a photo or scan of a passport, " +
   "national ID card or driver's licence and it returns what is printed on the document as " +
   "structured JSON. Reach for scan_document whenever someone shares such a document and " +
-  "wants it read, transcribed or checked — it draws one credit ($0.01) per document actually " +
+  "wants it read, transcribed or checked – it draws one credit ($0.01) per document actually " +
   "recognised and nothing at all when the image holds no readable document. Call " +
   "check_balance before working through a batch, and search_docs for field names, error " +
   "codes, MRZ rules and anything else about the API rather than guessing at them.";
@@ -199,13 +199,13 @@ export function buildServer(
         "Recognise a passport, national ID card or driver's licence from a photo or scan and " +
         "return what is printed on it as structured JSON. " +
         imageInputsSentence(remote) +
-        "Output: a Scan object — meta (id, status, billed, confidence, timing), document " +
+        "Output: a Scan object – meta (id, status, billed, confidence, timing), document " +
         "(kind, issuing country, number, series, date of issue, date of expiry, whether it " +
         "has expired and how many days are left), holder " +
         "(given names, surname, date of birth, sex, nationality), fields (every field read " +
         "off the printed page, each with its own confidence), mrz (whether the " +
         "machine-readable zone checks out, why not when it does not, and its lines exactly " +
-        "as read), images, quality and authenticity — plus a one-line summary of the same " +
+        "as read), images, quality and authenticity – plus a one-line summary of the same " +
         "result. Calls POST /v1/scans. " +
         "Cost: it bills one credit ($0.01) only when a document is recognised; an unreadable " +
         "image, an empty frame or an unsupported type costs nothing, and meta.billed says " +
@@ -213,7 +213,7 @@ export function buildServer(
         SANDBOX_ALLOWANCE +
         " " +
         "Use it whenever someone hands over an identity document and wants it read, " +
-        "transcribed, or checked against what they claim — a name, a document number, a date " +
+        "transcribed, or checked against what they claim – a name, a document number, a date " +
         "of birth or an expiry date.",
       // Behaviour hints, each one a claim about what this handler below does.
       //
@@ -334,7 +334,7 @@ export function buildServer(
         "without calling anything. " +
         "One recognised document draws one credit, at $0.01; scans that recognised nothing " +
         "are counted and never charged. " +
-        "Needs a real API key — under the public sandbox key there is no account behind the " +
+        "Needs a real API key – under the public sandbox key there is no account behind the " +
         "call, and the answer says so instead of reporting zeros that read like a balance. " +
         "Use it before working through a batch of documents, or when a scan is refused for " +
         "lack of credit.",
@@ -389,14 +389,14 @@ export function buildServer(
     {
       title: "Search the doc.cheap API documentation",
       description:
-        "Full-text search over the doc.cheap API documentation — endpoints, request options, " +
+        "Full-text search over the doc.cheap API documentation – endpoints, request options, " +
         "every response field, the error codes and what to do about each, MRZ rules, " +
         "retention and pricing. " +
         "Takes a query and an optional limit (1 to 20, default 5), and answers with the " +
         "matching sections: title, a snippet, and a link to the page. " +
         "It reads a copy of the documentation shipped beside this server, so it makes no " +
         "network call and works offline. " +
-        "Use it before guessing at a field name, an error code or a scan option — what it " +
+        "Use it before guessing at a field name, an error code or a scan option – what it " +
         "returns is the published contract rather than a recollection of it.",
       annotations: {
         // Reading markdown off the local disk: no request leaves the process
@@ -439,7 +439,7 @@ export function buildServer(
           };
         }
         const lines = hits.map(
-          (hit, index) => `${index + 1}. ${hit.title} — ${hit.link}\n   ${hit.snippet}`,
+          (hit, index) => `${index + 1}. ${hit.title} – ${hit.link}\n   ${hit.snippet}`,
         );
         return {
           structuredContent: { results: hits },

@@ -23,31 +23,31 @@ uploaded image is never written down.
 
 ## The recognition itself
 
-- [How recognition works](/concepts/how-recognition-works) — what happens
+- [How recognition works](/concepts/how-recognition-works) – what happens
   between the bytes arriving and the fields coming back, and where our own
   timing boundaries fall.
-- [Confidence and readings](/concepts/confidence-and-readings) — why
+- [Confidence and readings](/concepts/confidence-and-readings) – why
   confidence is a band, and why one field can be read several ways at once.
-- [The MRZ and the visual zone](/concepts/mrz-and-the-visual-zone) — why a
+- [The MRZ and the visual zone](/concepts/mrz-and-the-visual-zone) – why a
   document says the same thing twice, and which half to believe.
 
 ## Money
 
-- [What a billed scan is](/concepts/what-a-billed-scan-is) — the rule that
+- [What a billed scan is](/concepts/what-a-billed-scan-is) – the rule that
   decides whether a call costs a credit, and the outcomes it produces.
-- [Crypto deposits](/concepts/crypto-deposits) — why an address is permanent,
+- [Crypto deposits](/concepts/crypto-deposits) – why an address is permanent,
   why a locked price has bounds, and why a large deposit waits longer.
 
 ## Your data and your identity
 
-- [Data retention and privacy](/concepts/data-retention-and-privacy) — what is
+- [Data retention and privacy](/concepts/data-retention-and-privacy) – what is
   kept, what is never written down, and what deletion removes.
-- [API keys and sessions](/concepts/api-keys-and-sessions) — the three kinds of
+- [API keys and sessions](/concepts/api-keys-and-sessions) – the three kinds of
   key, the dashboard session beside them, and why the two are kept apart.
 
 ## When it does not work
 
-- [Reliability](/concepts/reliability) — what is measured, what a headline
+- [Reliability](/concepts/reliability) – what is measured, what a headline
   means, and what happens to your credit when a dependency is away.
 
 Each page is bounded on purpose. An explanation that grows a field table has

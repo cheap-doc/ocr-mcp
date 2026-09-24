@@ -156,8 +156,8 @@ overdraws an account.
 
 ## Next
 
-- [Crypto deposits](/concepts/crypto-deposits) — the reasoning behind the
+- [Crypto deposits](/concepts/crypto-deposits) – the reasoning behind the
   locks, the depths and the price rules.
-- [Track usage and spend](/guides/track-usage-and-spend) — reading the balance
+- [Track usage and spend](/guides/track-usage-and-spend) – reading the balance
   the credits landed on.
-- [What a billed scan is](/concepts/what-a-billed-scan-is) — what a credit buys.
+- [What a billed scan is](/concepts/what-a-billed-scan-is) – what a credit buys.

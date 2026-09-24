@@ -41,8 +41,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`unsupported_media_type`](/errors/unsupported_media_type) — the body was not JSON.
-- [`invalid_request`](/errors/invalid_request) — the request could not be read.
+- [`unsupported_media_type`](/errors/unsupported_media_type) – the body was not JSON.
+- [`invalid_request`](/errors/invalid_request) – the request could not be read.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

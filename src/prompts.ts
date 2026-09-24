@@ -68,7 +68,7 @@ export function registerPrompts(server: McpServer, docsDir: string, docsBase: st
           `Check whether the document in the image at ${image_url} has expired.\n\n` +
             "Call the scan_document tool with image_url set to that address. Report " +
             "document.expiry_date, document.is_expired and document.days_remaining exactly " +
-            "as returned — they are worked out on the day of the scan. Say plainly whether " +
+            "as returned – they are worked out on the day of the scan. Say plainly whether " +
             "the document is expired today and how many days it has left, or how long ago it " +
             "expired.\n\n" +
             "If expiry_date is null, say the expiry date could not be read rather than " +
@@ -106,8 +106,8 @@ export function registerPrompts(server: McpServer, docsDir: string, docsBase: st
               "says when the public sandbox key is in use. Then call scan_document once per " +
               "address, one at a time, each with its own idempotency_key so that a retry " +
               "never charges twice.\n\n" +
-              "Afterwards give one table — address, status, document type, document number, " +
-              "billed — and then list every address that failed or was not recognised, with " +
+              "Afterwards give one table – address, status, document type, document number, " +
+              "billed – and then list every address that failed or was not recognised, with " +
               "the reason the tool gave.",
           ),
         ],
@@ -121,7 +121,7 @@ export function registerPrompts(server: McpServer, docsDir: string, docsBase: st
       title: "Explain an API error code",
       description:
         "Explain what a doc.cheap API error code means, whether retrying helps, and what " +
-        "to change — from the documentation page for that code.",
+        "to change – from the documentation page for that code.",
       argsSchema: {
         error_code: z
           .string()

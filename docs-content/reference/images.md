@@ -90,7 +90,7 @@ Every failure answers with the original bytes instead:
 - a format the encoder will not write back;
 - a source with no readable size.
 
-A merely warning-worthy source — a truncated scan line, a bad marker — still
+A merely warning-worthy source – a truncated scan line, a bad marker – still
 produces a picture rather than an exception.
 
 Such a failure is not reported anywhere and does not appear in the response. It

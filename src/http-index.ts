@@ -5,8 +5,9 @@
 // every line this process writes goes to stdout as one JSON object, which is
 // what the container's log collector reads.
 import { readRelease } from "./vendor/observability/release.ts";
+import { createSharedAppendLog } from "@doc-cheap/observability/append-log";
 import { loadConfig } from "./config.ts";
-import { createMcpHttpServer } from "./http.ts";
+import { createMcpHttpServer, MCP_PATH } from "./http.ts";
 import {
   CRASH_EXIT_CODE,
   createStderrLogger,
@@ -14,6 +15,7 @@ import {
   reportBootFailure,
 } from "./observability/process-handlers.ts";
 import { createSentryReporter } from "./observability/reporter.ts";
+import { mcpRequestLogRecord, readRequestLogPath } from "./request-log.ts";
 import { SERVER_VERSION } from "./version.ts";
 
 const writeLine = (line: string): void => {
@@ -40,6 +42,20 @@ function parsePort(value: string | undefined): number {
   return port;
 }
 
+// The MCP traffic report's file (request-log.ts decides what is in a line).
+// Unset, nothing is written. Bounded like every file on the production host,
+// and a failure to write is counted and logged, never a failed request.
+const requestLogPath = readRequestLogPath(process.env);
+const requestLog = requestLogPath
+  ? createSharedAppendLog({
+      path: requestLogPath,
+      maxBytes: 64 * 1024 * 1024,
+      keep: 3,
+      onError: (error) =>
+        logger.warn("the MCP request log is not being written", { error: String(error) }),
+    })
+  : null;
+
 try {
   const port = parsePort(process.env.PORT?.trim() || undefined);
   const host = process.env.HOST?.trim() || "0.0.0.0";
@@ -48,9 +64,14 @@ try {
     reporter,
     release,
     log: (line) => {
+      const at = new Date();
       writeLine(
-        `${JSON.stringify({ time: new Date().toISOString(), level: "info", release, environment, ...line })}\n`,
+        `${JSON.stringify({ time: at.toISOString(), level: "info", release, environment, ...line })}\n`,
       );
+      if (requestLog !== null) {
+        const record = mcpRequestLogRecord(line, at, MCP_PATH);
+        if (record !== null) requestLog.write(record);
+      }
     },
   });
   await new Promise<void>((resolve, reject) => {

@@ -241,8 +241,8 @@ belong in a log.
 
 ## Next
 
-- [Retry safely with idempotency](/guides/retry-safely-with-idempotency) — the
+- [Retry safely with idempotency](/guides/retry-safely-with-idempotency) – the
   three conflict codes, and what each one arbitrates.
-- [The error reference](/reference/errors) — all 21 codes with their causes.
-- [HTTP status codes](/reference/http-status-codes) — which codes share a
+- [The error reference](/reference/errors) – all 21 codes with their causes.
+- [HTTP status codes](/reference/http-status-codes) – which codes share a
   status, and why.

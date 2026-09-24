@@ -39,7 +39,7 @@ without the consumer changing.
 |---|---|
 | Removing a key from a response | Yes |
 | Renaming a key | Yes |
-| Narrowing a type — a nullable key that stops being nullable is not breaking; one that starts being nullable is | Yes, when it widens |
+| Narrowing a type – a nullable key that stops being nullable is not breaking; one that starts being nullable is | Yes, when it widens |
 | Adding a value to an enum a consumer branches on | Yes |
 | Removing a request field | Yes |
 | Making an optional request field required | Yes |

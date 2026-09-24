@@ -256,8 +256,8 @@ operations log and is not readable through the API.
 
 ## Next
 
-- [Result images](/reference/images) — the slots, the caps and the re-encode as
+- [Result images](/reference/images) – the slots, the caps and the re-encode as
   reference.
-- [Data retention and privacy](/concepts/data-retention-and-privacy) — why no
+- [Data retention and privacy](/concepts/data-retention-and-privacy) – why no
   crop is written down.
-- [Scan options](/reference/scan-options) — `return_portrait` and the rest.
+- [Scan options](/reference/scan-options) – `return_portrait` and the rest.

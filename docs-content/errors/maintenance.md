@@ -46,7 +46,7 @@ and writes one log line.
 
 ## Related codes
 
-- [`service_unavailable`](/errors/service_unavailable) — a dependency is unreachable.
+- [`service_unavailable`](/errors/service_unavailable) – a dependency is unreachable.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

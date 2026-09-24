@@ -165,10 +165,10 @@ print(scan["meta"]["reference"], scan["images"]["main_photo"])
 `document` and `holder` carry the curated values, and each is `null` as a whole
 when the scan produced nothing for it.
 
-- `document` — `kind`, `country`, `country_name`, `issuing_state`, `type_name`,
+- `document` – `kind`, `country`, `country_name`, `issuing_state`, `type_name`,
   `type_confidence`, `number`, `series`, `issue_date`, `expiry_date`,
   `is_expired` and `days_remaining`.
-- `holder` — `given_names`, `surname`, `full_name`, `birth_date`, `sex` and
+- `holder` – `given_names`, `surname`, `full_name`, `birth_date`, `sex` and
   `nationality`.
 
 Everything the engine read off the printed page is in `fields`, one entry per
@@ -210,7 +210,7 @@ one entry each, rather than choosing for you.
   `id`.
 - `language` is `null` on the neutral, transliterated reading and names the
   language on the other.
-- `confidence` is a band — `high`, `medium` or `low` — never a number.
+- `confidence` is a band – `high`, `medium` or `low` – never a number.
 
 `holder.surname` carries the Latin reading. Read the `fields` entry when you
 want the spelling the document prints.
@@ -280,7 +280,7 @@ error is a different thing entirely, and
 
 ## Next
 
-- [Work with result images](/guides/work-with-result-images) — the crops this
+- [Work with result images](/guides/work-with-result-images) – the crops this
   call returns and their sizes.
-- [Control history retention](/guides/control-history-retention) — reading a
+- [Control history retention](/guides/control-history-retention) – reading a
   scan back later, and keeping nothing at all.

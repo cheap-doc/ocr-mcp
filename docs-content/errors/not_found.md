@@ -50,7 +50,7 @@ and writes one log line.
 
 ## Related codes
 
-- [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) — nothing left to replay.
+- [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) – nothing left to replay.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

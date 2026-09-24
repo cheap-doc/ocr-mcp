@@ -123,14 +123,14 @@ export function createApiClient(config: McpConfig): ApiClient {
       // limit — is the API answering, not failing. It carries its own code,
       // message and docs link, which is everything the caller needs, so it
       // travels back as an expected failure and stays out of any report.
-      if (!response.ok) throw new ExpectedFailure(`Scan failed — ${await describeError(response)}`);
+      if (!response.ok) throw new ExpectedFailure(`Scan failed – ${await describeError(response)}`);
       return (await response.json()) as Scan;
     },
 
     async getUsage(context) {
       const response = await request("/v1/usage", { headers: withContext(baseHeaders, context) });
       if (!response.ok) {
-        throw new ExpectedFailure(`Usage lookup failed — ${await describeError(response)}`);
+        throw new ExpectedFailure(`Usage lookup failed – ${await describeError(response)}`);
       }
       return (await response.json()) as Usage;
     },

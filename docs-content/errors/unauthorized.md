@@ -45,8 +45,8 @@ and writes one log line.
 
 ## Related codes
 
-- [`registration_required`](/errors/registration_required) — the anonymous allowance is spent.
-- [`impersonation_read_only`](/errors/impersonation_read_only) — an administrator's view may only read.
+- [`registration_required`](/errors/registration_required) – the anonymous allowance is spent.
+- [`impersonation_read_only`](/errors/impersonation_read_only) – an administrator's view may only read.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

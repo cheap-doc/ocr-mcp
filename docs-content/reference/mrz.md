@@ -1,6 +1,6 @@
 ---
 title: MRZ reference
-description: The machine-readable zone as this API publishes it — the lines, the unbroken text, the three formats, and how the check digits are reported.
+description: The machine-readable zone as this API publishes it – the lines, the unbroken text, the three formats, and how the check digits are reported.
 type: reference
 keyword: mrz machine readable zone api
 nav: MRZ reference

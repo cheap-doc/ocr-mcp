@@ -236,8 +236,8 @@ arrives as one line.
 
 ## Next
 
-- [Field languages and scripts](/reference/fields/languages) — the full table
+- [Field languages and scripts](/reference/fields/languages) – the full table
   of identifiers and what each resolves to.
-- [Field catalogue](/reference/fields) — every key, its label and its category.
-- [Confidence and readings](/concepts/confidence-and-readings) — why two
+- [Field catalogue](/reference/fields) – every key, its label and its category.
+- [Confidence and readings](/concepts/confidence-and-readings) – why two
   readings of one field may disagree.

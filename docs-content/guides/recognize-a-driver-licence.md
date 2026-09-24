@@ -171,8 +171,8 @@ carries its value as a string, the way every entry of `fields[]` does.
 
 ## Next
 
-- [The response](/reference/response) — every group, key by key.
-- [Recognize a passport](/guides/recognize-a-passport) — the zone layouts, for
+- [The response](/reference/response) – every group, key by key.
+- [Recognize a passport](/guides/recognize-a-passport) – the zone layouts, for
   the licences that do carry one.
-- [Handle errors](/guides/handle-errors) — what an HTTP error means here, as
+- [Handle errors](/guides/handle-errors) – what an HTTP error means here, as
   against a `200` that recognized nothing.

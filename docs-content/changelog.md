@@ -11,7 +11,15 @@ section: Changelog
 Dated, public record of changes to the API and its documentation. The most
 recent change is first.
 
-## 2026-09-24 — 1.29.0, the list endpoint documented, links that resolve
+## 2026-09-24 – 1.29.2, a damaged image is refused, not a failure
+
+An image that starts like a JPEG or PNG and cannot be decoded, such as a file
+cut off after its header, is refused with 415
+[`unsupported_media_type`](/errors/unsupported_media_type) instead of 500
+`internal_error`. Nothing is charged, and the sandbox key's free attempt is
+handed back.
+
+## 2026-09-24 – 1.29.0, the list endpoint documented, links that resolve
 
 `GET /v1/scans` now has its own reference page, like the other three
 endpoints, and is listed in `llms.txt`. The markdown copies of the pages and
@@ -20,16 +28,16 @@ one of them lands on its page. When the public sandbox key runs out of
 requests for the hour, the refusal now says so: `Sandbox limit of 10 requests
 per hour per IP reached.`
 
-## 2026-09-24 — 1.28.0, an image that is not one is refused
+## 2026-09-24 – 1.28.0, an image that is not one is refused
 
-`POST /v1/scans` reads JPEG and PNG. An `image` whose bytes are neither — a
-PDF, a HEIC photo, a text file, a file cut off after its first bytes — is now
+`POST /v1/scans` reads JPEG and PNG. An `image` whose bytes are neither – a
+PDF, a HEIC photo, a text file, a file cut off after its first bytes – is now
 refused with 415 [`unsupported_media_type`](/errors/unsupported_media_type)
 before recognition runs. It used to reach recognition and come back as 500
 `internal_error`. Nothing is charged, and no free attempt of the sandbox key is
 spent.
 
-## 2026-09-17 — 1.0.0, the first production release
+## 2026-09-17 – 1.0.0, the first production release
 
 The document-recognition API, at version 1.
 
@@ -39,8 +47,8 @@ no callback to register. Passports, identity cards, travel documents and
 driving licences are read off the printed page, the machine-readable zone and a
 barcode where one is printed.
 
-**One response shape.** Eight groups — `meta`, `document`, `holder`, `fields`,
-`mrz`, `images`, `quality` and `authenticity` — described key by key on
+**One response shape.** Eight groups – `meta`, `document`, `holder`, `fields`,
+`mrz`, `images`, `quality` and `authenticity` – described key by key on
 [the response](/reference/response). `document` carries the document's kind,
 issuing state, number, series, date of issue and date of expiry, and whether it
 has expired. Every key is present; an absent value is `null` and an absent
@@ -55,8 +63,8 @@ neither chosen for you.
 beside it: the lines exactly as read, and one unbroken `text` a check-digit
 routine takes unchanged.
 
-**Result images.** Seven crops, each capped by height — 250 px for the document
-crop, 100 px for the rest — returned by the call that produced them and never
+**Result images.** Seven crops, each capped by height – 250 px for the document
+crop, 100 px for the rest – returned by the call that produced them and never
 stored.
 
 **Billing.** One credit is one US cent, charged only for a recognition that
