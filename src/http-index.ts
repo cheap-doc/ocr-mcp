@@ -5,7 +5,7 @@
 // every line this process writes goes to stdout as one JSON object, which is
 // what the container's log collector reads.
 import { readRelease } from "./vendor/observability/release.ts";
-import { createSharedAppendLog } from "@doc-cheap/observability/append-log";
+import { createSharedAppendLog } from "./vendor/observability/append-log.ts";
 import { loadConfig } from "./config.ts";
 import { createMcpHttpServer, MCP_PATH } from "./http.ts";
 import {
