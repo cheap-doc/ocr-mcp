@@ -81,13 +81,23 @@ a separate question from **recognized**. A scan can be billed without being
 recognized; the rule that decides is on
 [what a billed scan is](/concepts/what-a-billed-scan-is).
 
-**Balance.** The credits an account holds. It is also the number of documents
-left, because one document is one credit. It never goes negative.
+**Balance.** The credits an account holds, in two parts: this month's free
+credits and the paid credits. It is also the number of documents left, because
+one document is one credit. It never goes negative.
+
+**Free credits.** The 100 free documents every account gets every month. They
+are set back to 100 at 00:00 UTC on the first of each month, with no carry-over.
+They are drawn before paid credits, once the account's email address is
+confirmed. `free_allowance` in `GET /v1/usage` reports them.
+
+**Paid credits.** The credits a top-up buys. They never reset, and only scans
+and purchases change them. `paid_balance_credits` in `GET /v1/usage` reports
+them.
 
 **Reservation.** A credit held before the engine is called and settled after.
 A scan that never reached the engine releases it, so nothing is charged.
 
-**Top-up.** Adding credits to a balance. A crypto top-up quotes an amount at a
+**Top-up.** Adding paid credits to a balance. A crypto top-up quotes an amount at a
 price that is locked for the life of the quote.
 
 ## Keys and identity

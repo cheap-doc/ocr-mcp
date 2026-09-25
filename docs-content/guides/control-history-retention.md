@@ -153,9 +153,11 @@ A zero-retention scan is still charged and still counted in usage. What it does
 not do is leave a row behind.
 
 > **Warning.** `retain_hours: 0` also removes the replay an
-> `Idempotency-Key` would have served. A retry under the same key answers 409
+> `Idempotency-Key` would have served. For 24 hours a retry under the same key
+> answers 409
 > [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable),
-> because nothing was kept to replay.
+> because nothing was kept to replay. After that the key is forgotten, and a
+> retry under it is a new scan, charged again.
 
 ## Read a result back
 

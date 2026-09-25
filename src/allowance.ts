@@ -7,8 +7,8 @@
 // address; the hourly ceiling counts every request the sandbox key makes from
 // that address, whatever it is answered — a balance lookup included, which is
 // why check_balance does not make one under this key. Registering grants the
-// account 20 credits.
+// account 100 free credits every UTC calendar month.
 export const SANDBOX_ALLOWANCE =
   "Without a key, the public sandbox key is used. It gives 10 free recognised documents per " +
   "address in all, and at most 10 requests per address an hour, whatever their answer. " +
-  "Registering gives 20 free credits.";
+  "Registering gives 100 free documents every month.";

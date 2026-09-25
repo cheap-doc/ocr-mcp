@@ -62,7 +62,7 @@ The top-up page follows the deposit through three states.
 2. **Seen.** The transfer has been found on the chain and is waiting to be
    buried under enough confirmations. A larger deposit waits for a deeper
    burial than a small one.
-3. **Credited.** The credits are on the balance, and the operations log carries
+3. **Credited.** The paid credits are on the balance, and the operations log carries
    the entry.
 
 A deposit is never credited before it is deep enough. That wait is the price of

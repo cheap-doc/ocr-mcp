@@ -24,7 +24,7 @@ recognitions per client on top of that.
    every field that comes back, and see what the call took. No account.
 2. [From the sandbox to a live key](/start/from-sandbox-to-live) – spend the
    free allowance, register, and point the same code at a key that bills. An
-   account, and no money: registration comes with 20 credits.
+   account, and no money: every account gets 100 free documents every month.
 3. [Recognize a document without code](/start/recognize-without-code) – upload
    in the dashboard and read the result on screen. An account. No code at all.
 
@@ -36,7 +36,9 @@ deciding whether to.
 Nothing on either sandbox key. On a live key, one credit per billable scan, and
 one credit is one US cent. A scan is billable when the engine determined the
 document type and read something from it. A refusal that happened before the
-engine ran is never charged. The rule, and the cases around it, are on
+engine ran is never charged. Every account gets 100 free documents every month,
+and those credits are spent before any paid ones. The rule, and the cases
+around it, are on
 [what a billed scan is](/concepts/what-a-billed-scan-is).
 
 ## Where to go next

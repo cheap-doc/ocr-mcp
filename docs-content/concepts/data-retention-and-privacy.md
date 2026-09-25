@@ -83,9 +83,11 @@ and forgotten.
 
 It costs one thing, and the cost is worth knowing before it surprises anybody.
 An `Idempotency-Key` sent with a zero-retention scan has no stored result to
-replay. A retry under that key is refused with
+replay. For 24 hours a retry under that key is refused with
 `idempotency_replay_unavailable` rather than answered twice. The refusal is
-the correct one: a replay that invented an answer would be worse.
+the correct one: a replay that invented an answer would be worse. After those
+24 hours the key is forgotten, and a retry under it is a new scan, charged
+again.
 
 ## The window runs from the scan
 

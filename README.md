@@ -7,7 +7,7 @@
 
 Give your assistant a passport, national ID card or driver's licence and get the
 printed fields back as structured JSON – **$0.01 per recognised document**, and
-free to try before you register. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits.
+free to try before you register. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 100 free documents every month.
 
 An [MCP](https://modelcontextprotocol.io) server over stdio, for Claude Desktop,
 Claude Code, Cursor, VS Code, Gemini CLI, Windsurf, Kiro and any other MCP
@@ -25,7 +25,7 @@ npx -y @doc-cheap/mcp
 login: send your key as `X-Doc-Cheap-Api-Key: sk_live_your_key` or
 `Authorization: Bearer sk_live_your_key` – the named header wins when both are
 sent, and an `Authorization` that is not a doc.cheap key is ignored rather than
-passed on. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits. The
+passed on. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 100 free documents every month. The
 hosted server cannot read files on your machine, so `scan_document` takes the
 image as `image_base64` or `image_url`; `image_path` is for the local server
 only.
@@ -76,7 +76,7 @@ VS Code, `.vscode/mcp.json` (the key is asked for once and stored by VS Code):
 
 ## Install locally
 
-Set `DOC_CHEAP_API_KEY` to your key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits. The sandbox key has no balance.
+Set `DOC_CHEAP_API_KEY` to your key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 100 free documents every month. The sandbox key has no balance.
 
 ### Claude Desktop – one-click extension
 
@@ -263,13 +263,14 @@ rather than recognising and charging a second time.
 
 ### `check_balance`
 
-No arguments. Returns the balance, the credits spent and this period's scan
-counters by status. With the public sandbox key there is no account behind the
+No arguments. Returns the balance – this month's free credits (100 every month,
+drawn first) and the paid credits, each on its own – the credits spent and this
+period's scan counters by status. With the public sandbox key there is no account behind the
 call: the balance comes back as `null`, and the first line says so and how to
 get a key, instead of reporting zeros that read like a balance.
 
 ```text
-Balance: 1840 credits · 63 scans this period (58 billed, 58 credits spent).
+Balance: 1840 credits · 42 free credits left this month · 1798 paid credits · 63 scans this period (58 billed, 58 credits spent).
 ```
 
 ### `search_docs`
@@ -355,7 +356,7 @@ When it calls the doc.cheap API it identifies itself in the request's
 `User-Agent`, the way any HTTP client does:
 
 ```
-doc-cheap-mcp/0.3.5 (claude-code/1.4.2)
+doc-cheap-mcp/0.3.6 (claude-code/1.4.2)
 ```
 
 The first half is this package and its version. The second half is **the name
@@ -367,7 +368,7 @@ actually are. It is never used to change what the server does, and nothing else
 about you, your prompts, your files or your images travels with it.
 
 **Switching it off:** set `DO_NOT_TRACK=1` in the server's environment. The
-request then carries `doc-cheap-mcp/0.3.5` and nothing more – no client name, no
+request then carries `doc-cheap-mcp/0.3.6` and nothing more – no client name, no
 client version, no `baggage` header – and everything else works identically.
 
 Your API key already identifies your account to the API; that is what a key is

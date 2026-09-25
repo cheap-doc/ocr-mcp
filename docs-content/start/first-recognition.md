@@ -292,7 +292,9 @@ print(usage["balance_credits"], usage["scans"]["total"])
 ```
 
 The public sandbox key carries no account, so `balance_credits` comes back
-`null` and the counters stay at zero. A key of your own reports real figures.
+`null` and the counters stay at zero. A key of your own reports real figures:
+`balance_credits` is this month's free credits plus the paid credits, and
+`free_allowance` and `paid_balance_credits` give each on its own.
 
 ## Next
 

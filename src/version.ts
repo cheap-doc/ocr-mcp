@@ -5,4 +5,4 @@
 // a release and the server needs the reporter: with the constants left in
 // `server.ts` those two would import each other in a circle.
 export const SERVER_NAME = "doc-cheap-mcp";
-export const SERVER_VERSION = "0.3.5";
+export const SERVER_VERSION = "0.3.6";

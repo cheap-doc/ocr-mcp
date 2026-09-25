@@ -35,7 +35,8 @@ because a caller who cannot be served should not consume recognition capacity
 to find that out.
 
 The balance is the last of those gates on a live key. A credit is put on hold
-before the engine is called. An account that cannot pay is turned away at that
+before the engine is called. It comes from this month's free credits first, and
+from the paid credits once those are used up. An account that cannot pay is turned away at that
 point rather than after the work.
 
 `meta.timing.upload_ms` covers the first part of that and not the rest. It is

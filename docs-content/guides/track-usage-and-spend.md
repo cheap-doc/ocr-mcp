@@ -50,17 +50,54 @@ with urllib.request.urlopen(request) as response:
 print(usage["balance_credits"], usage["credits_spent"], usage["scans"]["total"])
 ```
 
-The body has four parts.
+The body has seven parts.
 
 | Key | Carries |
 |---|---|
-| `balance_credits` | Credits available to the account right now, or null for a key with no account |
+| `balance_credits` | Credits available to the account right now – this month's free credits plus the paid credits – or null for a key with no account |
+| `free_allowance` | This month's free credits: `monthly_credits` (100), `remaining_credits` and `resets_at`; null when the account may not draw free credits |
+| `paid_balance_credits` | Paid credits, which never reset; null for a key with no account |
 | `period` | The bounds of the current period, as a UTC calendar month |
 | `scans` | `total`, `billed`, and `by_status` with one count per recognition status |
 | `credits_spent` | Credits charged within the period |
+| `credits_spent_by_kind` | `credits_spent` split into `free` and `paid`, by the balance each credit came from |
 
-`balance_credits` is a **current** figure and does not belong to the period.
-Everything else in the body does.
+`balance_credits`, `free_allowance` and `paid_balance_credits` are **current**
+figures and do not belong to the period. Everything else in the body does.
+
+## Read the two balances
+
+Every account holds two balances, and a billable scan draws one credit from the
+first that has any.
+
+1. **This month's free credits.** An account gets 100 free documents every
+   month. `free_allowance.remaining_credits` is what is left of them.
+   `free_allowance.resets_at` is when they are next set back to 100: 00:00 UTC
+   on the first of the next month. What is left at that moment does not carry
+   over.
+2. **Paid credits.** `paid_balance_credits` is what top-ups bought and scans
+   have not yet used. It never resets; only scans and purchases change it.
+
+`free_allowance` is null when the account may not draw free credits: while its
+email address is not confirmed, or when its free credits have been withdrawn. The
+paid credits still work then, and `balance_credits` is the paid credits alone.
+
+```json
+{
+  "balance_credits": 540,
+  "free_allowance": {
+    "monthly_credits": 100,
+    "remaining_credits": 40,
+    "resets_at": "2026-10-01T00:00:00.000Z"
+  },
+  "paid_balance_credits": 500,
+  "credits_spent": 60,
+  "credits_spent_by_kind": { "free": 60, "paid": 0 }
+}
+```
+
+The example shows only the balance fields; the full body also carries `period`
+and `scans`.
 
 ## Read the status breakdown
 
@@ -108,8 +145,8 @@ counters. Usage is an account-level question, and the answer does not change
 with the key that asked it.
 
 The public sandbox key belongs to no account. It answers with a well-formed
-body carrying a null balance and zero counters, rather than an invented
-example.
+body carrying a null balance, a null `free_allowance`, a null
+`paid_balance_credits` and zero counters, rather than an invented example.
 
 Neither sandbox key ever adds to `credits_spent`. A registered sandbox key is
 answered from a fixed synthetic specimen and is never charged.
@@ -119,24 +156,29 @@ answered from a fixed synthetic specimen and is never charged.
 The period is a UTC calendar month, and `period.start` and `period.end` name
 its bounds.
 
-At the rollover the counters return to zero and `balance_credits` does not.
-Credits carry over; the counters describe the month.
+At the rollover the counters return to zero and the free credits are set back:
+`free_allowance.remaining_credits` becomes 100 again. `paid_balance_credits` is
+unchanged. Paid credits carry over; the free credits and the counters describe
+the month.
 
 Read `period.start` before you store a reading. A job that runs near midnight
 UTC can take two readings belonging to different months. The bounds in the body
 are what tells them apart.
 
-Nothing expires at the rollover. A balance is spent when it is spent, and no
-figure here is a monthly allowance.
+No paid credit expires at the rollover. The only monthly figure is the free
+credits, which are set back to 100 rather than added to.
 
 ## Watch the balance from a deployment
 
 Poll `GET /v1/usage` on a schedule and alert on `balance_credits` below a
 threshold you choose. Size the threshold on your own daily volume.
 
-A balance that reaches zero does not go negative. The next scan is refused with
-402 [`insufficient_credits`](/errors/insufficient_credits), before the engine
-is called and before anything is charged.
+A balance that reaches zero does not go negative. When the month's free credits
+and the paid credits are both used up, the next scan is refused with 402
+[`insufficient_credits`](/errors/insufficient_credits). That happens before the
+engine is called and before anything is charged. To alert only on money you have to add,
+watch `paid_balance_credits` instead: the free credits come back on the first of
+the month by themselves.
 
 The dashboard shows the same figures with the operations log beside them, at
 <https://doc.cheap/app>. The log lists the individual scans; this endpoint is

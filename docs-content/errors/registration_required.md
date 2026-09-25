@@ -31,8 +31,8 @@ The free trial without an account is used up; register for your own API key to k
 ## The fix
 
 Register and use your own key instead of `sk_sandbox_public`. An account draws
-on its own balance rather than the shared anonymous allowance, so this wall does
-not apply to it.
+on its own balance: 100 free documents every month, then paid credits. It does
+not use the shared anonymous allowance, so this wall does not apply to it.
 
 The allowance is not refilled by waiting.
 

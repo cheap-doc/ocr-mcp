@@ -49,8 +49,10 @@ The repeat guard keeps only a digest of the image bytes, and only for the window
 – neither the image nor a durable record of it. It runs before the engine, so a
 refused repeat costs neither recognition time nor one of the free attempts.
 
-A registered account arrives with 20 free documents credited to its balance, and
-neither of these two walls applies to its keys.
+Neither of these two walls applies to a registered account's keys. An account
+gets 100 free documents every month instead, set back to 100 at 00:00 UTC on the
+first of the month. They are drawn before paid credits once its email address is
+confirmed – [where the free documents come from](/concepts/what-a-billed-scan-is#where-the-free-documents-come-from).
 
 ## Sizes
 

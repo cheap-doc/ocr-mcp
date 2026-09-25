@@ -1,6 +1,6 @@
 ---
 title: From the sandbox to a live key
-description: Register an account, claim the free documents it comes with, issue your own live key and point an existing integration at it.
+description: Register an account, use its 100 free documents every month, issue your own live key and point an existing integration at it.
 type: tutorial
 keyword: sandbox key to live api key
 nav: From sandbox to live
@@ -20,11 +20,12 @@ starts billing.
 |---|---|---|---|
 | Anonymous | `sk_sandbox_public` | 10 free recognitions per client, and 10 requests per hour per client address | Nothing |
 | Allowance spent | `sk_sandbox_public` | Every call answers `registration_required` | Nothing to spend |
-| Registered | `sk_live_…` | The 20 credits the account is created with | 1 credit each |
-| Topped up | `sk_live_…` | Whatever the balance holds | 1 credit each |
+| Registered | `sk_live_…` | 100 free credits every month, once the email address is confirmed | 1 credit each |
+| Topped up | `sk_live_…` | The month's free credits, then the paid credits bought | 1 credit each |
 
 One credit is one US cent, so the balance is also the number of documents left
-in it. The rule that decides whether a given call draws a credit is on
+in it. Free credits are drawn first, and paid credits once the month's free
+credits are used up. The rule that decides whether a given call draws a credit is on
 [what a billed scan is](/concepts/what-a-billed-scan-is).
 
 ## 1. Spend the anonymous allowance
@@ -60,8 +61,11 @@ meant to handle, not a failure we recorded. The
 
 ## 3. Register
 
-Create an account in the dashboard. The account is credited with 20 credits as
-it is created – 20 recognized documents, with no payment and no card.
+Create an account in the dashboard. It starts with this month's 100 free
+credits and no paid credits – 100 recognized documents every month, with no
+payment and no card. Confirm the email address first: the free credits are
+drawn only once it is confirmed. At 00:00 UTC on the first of every month they
+are set back to 100, and what was left does not carry over.
 
 ## 4. Take both keys
 
@@ -176,7 +180,9 @@ How long a result stays readable is your choice, per call or per account:
 ## 7. Check the balance
 
 `GET /v1/usage` answers `balance_credits: null` for a key with no account
-behind it, and a number for a live key.
+behind it, and a number for a live key: this month's free credits plus the paid
+credits. `free_allowance` and `paid_balance_credits` split it into the two
+balances – [track usage and spend](/guides/track-usage-and-spend).
 
 ```bash runnable tab=curl
 API_KEY=${API_KEY:-sk_sandbox_public}
@@ -214,10 +220,10 @@ with urllib.request.urlopen(request) as response:
 print(usage["balance_credits"], usage["scans"]["billed"], usage["credits_spent"])
 ```
 
-The counters cover the current UTC calendar month. A balance that cannot cover
-a scan refuses it with
+The counters cover the current UTC calendar month. When the month's free credits
+and the paid credits are both used up, a scan is refused with
 [`insufficient_credits`](/errors/insufficient_credits) before the engine is
-called, so an empty balance costs nothing and breaks nothing.
+called. An empty balance costs nothing and breaks nothing.
 
 ## Next
 

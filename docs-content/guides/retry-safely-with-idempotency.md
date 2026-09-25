@@ -232,6 +232,11 @@ retries to replay, ask for a retention window on the original request, at any
 value above zero. Otherwise a replay past it needs a new key, which is what the
 message on that code says.
 
+The refusal does not last for ever. A key whose request stored nothing is
+remembered for 24 hours. A key whose result has expired goes when the retention
+sweep removes that result. A retry under a forgotten key is a new scan, charged
+again.
+
 ## What a retry costs
 
 Nothing, when it replays. A replay does not call the engine and does not draw a

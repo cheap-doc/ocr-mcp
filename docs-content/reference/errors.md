@@ -59,7 +59,7 @@ These 17 are the API working. Each is a refusal with a reason, and each carries
 |---|---|---|
 | 400 | [`invalid_request`](/errors/invalid_request) | The request could not be read at all |
 | 401 | [`unauthorized`](/errors/unauthorized) | No usable API key |
-| 402 | [`insufficient_credits`](/errors/insufficient_credits) | The balance cannot cover one recognition |
+| 402 | [`insufficient_credits`](/errors/insufficient_credits) | This month's free credits and the paid credits are both used up |
 | 403 | [`registration_required`](/errors/registration_required) | The anonymous free allowance is spent |
 | 404 | [`not_found`](/errors/not_found) | No scan with that id, or no such route |
 | 409 | [`idempotency_conflict`](/errors/idempotency_conflict) | The key was used with a different body |
