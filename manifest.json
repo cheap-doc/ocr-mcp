@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "doc-cheap",
   "display_name": "doc.cheap – passport & ID OCR",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "Reads the printed fields from a photo or scan of a passport, national ID card or driver's licence and returns them as JSON.",
   "long_description": "Give Claude a photo or scan of a passport, national ID card or driver's licence and get back what is printed on it – names, dates, document number, issuing country and the machine-readable zone – as structured JSON, through the doc.cheap API.\n\nIt costs $0.01 for each document actually recognised; an unreadable image costs nothing. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 100 free documents every month. The server also checks your remaining credits and searches the doc.cheap API documentation, which ships inside the extension.\n\nThe server sends the image to the doc.cheap API only, and the API does not store it.",
   "author": {

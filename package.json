@@ -1,7 +1,7 @@
 {
   "name": "@doc-cheap/mcp",
-  "version": "0.3.6",
-  "description": "MCP server for passport, ID and MRZ recognition via the doc.cheap API – $0.01 per document",
+  "version": "0.3.7",
+  "description": "MCP server for passport, ID and MRZ recognition via the doc.cheap API – Free: 100 documents every month, then $0.01 each",
   "license": "MIT",
   "homepage": "https://doc.cheap/docs/guides/use-the-mcp-server",
   "repository": {
