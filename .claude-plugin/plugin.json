@@ -1,8 +1,8 @@
 {
   "name": "doc-cheap",
   "displayName": "doc.cheap document recognition",
-  "version": "0.3.6",
-  "description": "Recognise passports, ID cards and driver's licences from an image – $0.01 per document",
+  "version": "0.3.7",
+  "description": "Recognise passports, ID cards and driver's licences from an image – Free: 100 documents every month, then $0.01 each",
   "homepage": "https://doc.cheap/docs/guides/use-the-mcp-server",
   "repository": "https://gitlab.com/doccheap/ocr-mcp",
   "license": "MIT",
