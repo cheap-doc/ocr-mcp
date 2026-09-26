@@ -132,8 +132,9 @@ answered from a fixed specimen and never reaches the Engine.
 **A replayed request.**
 
 A retry carrying an `Idempotency-Key` that has already been used returns the
-first result and charges nothing the second time. That is the whole reason the
-header exists.
+first result and charges nothing the second time, while that result is stored.
+That is the whole reason the header exists. How long a key is remembered is on
+[idempotency](/reference/idempotency).
 
 **A failure on our side.**
 
@@ -162,10 +163,14 @@ A caller with no account has 10 free recognitions on the public sandbox key,
 counted per client. Past them the API answers `registration_required`, which
 is an invitation rather than a wall.
 
-An account arrives with 20 free documents credited to its balance. They are
-ordinary credits, indistinguishable from bought ones once they are there.
+An account gets 100 free documents every month. On the first of each month, at
+00:00 UTC, its free credits are set back to 100. What was left of the last month
+does not carry over. They can be drawn once the account's email address is
+confirmed, and a billable document draws on them first.
 
-After that, a balance is topped up and every billable document draws one
-credit from it. A credit is a cent and a document is a credit, so the balance
-is also the number of documents left. That is the only arithmetic a caller has
-to do.
+Paid credits are a second balance, bought by a top-up. They never reset, and
+only scans and purchases change them. A billable document draws one paid credit
+once the month's 100 free credits are used up, and when both are gone the API
+answers [`insufficient_credits`](/errors/insufficient_credits). A credit is a
+cent and a document is a credit, so the two balances together are also the
+number of documents left. That is the only arithmetic a caller has to do.

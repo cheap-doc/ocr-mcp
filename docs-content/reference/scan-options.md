@@ -125,7 +125,7 @@ the message. Nothing reaches the recognition engine, and nothing is charged.
 
 | Options | What happens |
 |---|---|
-| `retain_hours: 0` and an `Idempotency-Key` | The first result is returned once and not stored. A later retry under the same key answers [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) |
+| `retain_hours: 0` and an `Idempotency-Key` | The first result is returned once and not stored. For 24 hours a retry under the same key answers [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable); after that it is a new scan, charged again |
 | `retain_hours` and the account setting | The explicit value wins, `0` included; the setting applies only when the request sends `null` or nothing |
 | `return_portrait: false` and the rest | `images.main_photo` is null; the other six image slots are unaffected |
 

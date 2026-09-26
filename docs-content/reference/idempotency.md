@@ -86,22 +86,26 @@ so a slow scan is never mistaken for a dead one.
 
 ## How long a key is remembered
 
-A key is remembered for as long as the result it points at is stored, and no
-longer. No separate idempotency window exists.
+A key is remembered while the result it points at is stored. A key whose first
+request stored nothing is remembered for **24 hours** from when that request
+finished. Once a key is forgotten, a retry under it is a new request. The scan
+runs again, and a billable result is charged again.
 
 That makes `retain_hours` the control:
 
 | The first request asked for | A later retry under the same key |
 |---|---|
-| `retain_hours: 0` | 409 [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) – the result was returned once and never written down |
+| `retain_hours: 0` | For 24 hours, 409 [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable). The result was returned once and never written down. After that, a new scan, charged again |
 | A window that is still open | The stored result, 200 |
-| A window that has since closed | 409 [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable) |
+| A window that has since closed | 409 [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable). Once the retention sweep removes the scan and its key, a new scan, charged again |
 
-**A zero-retention scan and a replayable key are mutually exclusive.** The key
-is still recorded as used, so the request is never run twice. Nothing is left to
-hand back.
+**A zero-retention scan and a replayable key are mutually exclusive.** For 24
+hours the key is still recorded as used, so a retry is refused rather than run
+twice. Nothing is left to hand back. A client that may retry more than 24
+hours later should keep the first result itself, or ask for a retention window.
 
-A retention sweep removes an expired scan and its key together.
+The retention sweep runs every hour. It removes an expired scan and its key
+together, and a zero-retention key once its 24 hours have passed.
 
 ## The three codes, and what each one says to do
 

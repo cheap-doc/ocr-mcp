@@ -16,7 +16,9 @@ ran.
 
 You can call it right now, without an account, using the public sandbox key
 `sk_sandbox_public`. It recognizes the document you send, free of charge, for a
-limited number of documents and up to 10 requests per hour per IP.
+limited number of documents and up to 10 requests per hour per IP. A registered
+account gets 100 free documents every month, and after those each recognized
+document costs one cent.
 
 ## Try it in one call
 

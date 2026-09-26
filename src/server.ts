@@ -90,6 +90,9 @@ export function sandboxUsage(now: Date): Usage {
       >,
     },
     credits_spent: 0,
+    free_allowance: null,
+    paid_balance_credits: null,
+    credits_spent_by_kind: { free: 0, paid: 0 },
   };
 }
 
@@ -328,7 +331,8 @@ export function buildServer(
       title: "Check remaining credits",
       description:
         "Return how many credits are left on the account and what the current period has " +
-        "used: the balance, the credits spent, and the scan counters broken down by status " +
+        "used: the balance, split into this month's free credits (100 every month, drawn " +
+        "first) and the paid credits, the credits spent, and the scan counters broken down by status " +
         "(recognized, unreadable, no document found, unsupported document, rejected). " +
         "Takes no arguments and calls GET /v1/usage; under the public sandbox key it answers " +
         "without calling anything. " +

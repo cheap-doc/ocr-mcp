@@ -48,7 +48,7 @@ and writes one log line.
 ## Related codes
 
 - [`rate_unavailable`](/errors/rate_unavailable) – no corroborated exchange rate.
-- [`insufficient_credits`](/errors/insufficient_credits) – the balance cannot cover a recognition.
+- [`insufficient_credits`](/errors/insufficient_credits) – this month's free credits and the paid credits are both used up.
 
 The whole catalogue, grouped by what a caller does with it, is on
 [errors](/reference/errors).

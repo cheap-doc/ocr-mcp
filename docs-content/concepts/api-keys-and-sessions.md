@@ -115,6 +115,7 @@ it.
 ## The live key
 
 The third kind is the one that does the work. It reaches the engine and draws
+credits: the account's 100 free credits every month first, then its paid
 credits. Its results are stored under the account's retention window, and it
 is the only kind that can read them back.
 

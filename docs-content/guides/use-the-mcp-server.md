@@ -26,7 +26,7 @@ login is needed. Send your key as `X-Doc-Cheap-Api-Key: sk_live_your_key` or
 `Authorization: Bearer sk_live_your_key`. The named header wins when both are
 sent. That suits a client or proxy that uses `Authorization` for its own login.
 An `Authorization` that does not carry a doc.cheap key is ignored, never passed
-on. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits.
+on. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 100 free documents every month.
 
 The hosted server cannot read files on your machine, so `scan_document` takes
 the image as `image_base64` or `image_url` there.
@@ -55,7 +55,7 @@ Connectors, as a custom connector with that URL.
 ## Install it
 
 The package is `@doc-cheap/mcp`, and every client below starts it with `npx`.
-Set `DOC_CHEAP_API_KEY` to your key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits. The sandbox key has no
+Set `DOC_CHEAP_API_KEY` to your key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 100 free documents every month. The sandbox key has no
 balance.
 
 ### Claude Desktop, Cursor and Windsurf
@@ -149,7 +149,7 @@ Everything is optional, and every default is a working setting.
 | `DOC_CHEAP_IMAGE_ROOT` | Unset, which disables `image_path` | The one directory local images may be read from |
 | `DOC_CHEAP_SENTRY_DSN` | Unset, which reports nothing | Where failures are reported, if you want them reported |
 
-With no key set, the server uses the public sandbox key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 20 free credits. It has no
+With no key set, the server uses the public sandbox key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 100 free documents every month. It has no
 balance to report, so `check_balance` answers without calling the API.
 
 ## Use the three tools

@@ -23,6 +23,11 @@ elapses.
 Either way the key is known to have been used, so the request is not run again
 and nothing is left to hand back.
 
+That lasts only while the key is remembered. A zero-retention key is kept for 24
+hours after its request finished. An expired result's key goes when the
+retention sweep removes that result. After that, a retry under the same key
+runs as a new scan, and a billable result is charged again.
+
 ## The message
 
 ```text
