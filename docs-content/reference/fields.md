@@ -27,7 +27,7 @@ key on this page is a key the service publishes.
 | `label` | string | The human label catalogued below |
 | `category` | string | One of the six below |
 | `value` | string or null | The value of this reading |
-| `language` | string or null | The language this reading was made in |
+| `language` | string or null | The language this reading was made in; `English` on the default Latin reading, null only on `days_to_expire` |
 | `confidence` | band | `high`, `medium` or `low` |
 
 ## The identity rule
@@ -46,9 +46,9 @@ an occurrence counter.
 
 ```json
 [
-  { "id": "given_names@0", "name": "given_names", "language": null },
+  { "id": "given_names@0", "name": "given_names", "language": "English" },
   { "id": "given_names@1032", "name": "given_names", "language": "Greek" },
-  { "id": "given_names@0#2", "name": "given_names", "language": null }
+  { "id": "given_names@0#2", "name": "given_names", "language": "English" }
 ]
 ```
 
@@ -107,9 +107,9 @@ document carries no date of expiry. It is **absent entirely** when the scan
 produced no validity data at all: a countdown derived from nothing is not a
 countdown. Its confidence is that of the expiry-date reading it came from.
 
-`mrz` carries the zone's whole text as its value, with `language: null`. The
-zone is defined over a restricted Latin alphabet and has no language of its
-own. The formats are on [the MRZ reference](/reference/mrz).
+`mrz` carries the zone's whole text as its value, with `language: "English"`.
+The zone is defined over a restricted Latin alphabet and belongs to the default
+Latin reading, so it is named like every other `@0` entry. The formats are on [the MRZ reference](/reference/mrz).
 
 ## What is left out of the list
 
@@ -169,7 +169,7 @@ they are printed as a person's name across a line break.
 
 | `language` | `value` carries |
 |---|---|
-| `null` | The neutral reading: the transliterated Latin value the engine merged across sources |
+| `English` on an `@0` entry | The default reading: the transliterated Latin value the engine merged across sources |
 | A language name | The national-script spelling, as the document prints it |
 
 A document that prints the surname in two scripts yields two entries. They

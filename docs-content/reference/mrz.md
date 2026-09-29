@@ -124,12 +124,13 @@ therefore sees the part of the page that can be re-checked by hand.
 | `name` | `mrz` |
 | `label` | `MRZ` |
 | `category` | `document` |
-| `language` | `null` |
+| `language` | `English` |
 | `value` | The same string as `mrz.text` |
 | `confidence` | Always `high` |
 
-`language` is `null` because the zone is defined over a restricted Latin
-alphabet and has no language of its own.
+`language` is `English` because the zone is defined over a restricted Latin
+alphabet and belongs to the document's default Latin reading, like every other
+`@0` entry.
 
 `confidence` is always `high`, and it is not a measurement. The zone either
 read or it did not; the recognition engine reports no probability for the lines

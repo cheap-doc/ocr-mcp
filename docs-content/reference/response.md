@@ -74,7 +74,7 @@ throughout the documentation.
     "nationality": "GRC"
   },
   "fields": [
-    { "id": "surname@0", "name": "surname", "label": "Surname", "category": "identity", "value": "PARADEIGMA", "language": null, "confidence": "high" },
+    { "id": "surname@0", "name": "surname", "label": "Surname", "category": "identity", "value": "PARADEIGMA", "language": "English", "confidence": "high" },
     { "id": "surname@1032", "name": "surname", "label": "Surname", "category": "identity", "value": "ΠΑΡΑΔΕΙΓΜΑ", "language": "Greek", "confidence": "high" }
   ],
   "mrz": {
@@ -239,7 +239,7 @@ published, with a slugged key and the category `other`.
 | `label` | string | The human label |
 | `category` | string | `identity`, `document`, `dates`, `address`, `visa` or `other` |
 | `value` | string or null | The value of this reading |
-| `language` | string or null | The language this reading was made in |
+| `language` | string or null | The language this reading was made in; `English` on the default Latin reading, null only on `days_to_expire` |
 | `confidence` | band | How strongly this reading is backed |
 
 **`name` repeats; `id` does not.** A document that prints a field in two scripts

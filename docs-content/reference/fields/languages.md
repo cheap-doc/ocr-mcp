@@ -22,7 +22,7 @@ identifier it can be resolved from.
 
 | Key | Carries |
 |---|---|
-| `fields[].language` | The language name, for example `Greek`; `null` for the neutral Latin reading |
+| `fields[].language` | The language name, for example `Greek`; `English` for the default Latin reading |
 | `fields[].id` | `name@lcid` – the numeric identifier is the part after the `@` |
 
 The response carries the same fact twice, deliberately. `language` is the name
@@ -32,20 +32,25 @@ distinguishable however their names are spelled.
 
 ```json
 [
-  { "id": "surname@0", "name": "surname", "value": "PARADEIGMA", "language": null },
+  { "id": "surname@0", "name": "surname", "value": "PARADEIGMA", "language": "English" },
   { "id": "surname@1032", "name": "surname", "value": "ΠΑΡΑΔΕΙΓΜΑ", "language": "Greek" }
 ]
 ```
 
-## The neutral identifier
+## The default identifier
 
-`0` is not a language. It is the neutral, transliterated Latin reading – the
-value the engine merged across sources, spelled in the alphabet the
-machine-readable zone uses.
+`0` marks the document's default reading: the transliterated Latin value the
+engine merged across sources, spelled in the alphabet the machine-readable zone
+uses. It covers the Latin-script page and every value read out of the zone.
 
-It is reported as `language: null`, because the absence of a language is not a
-language of its own. Its entries still carry the `@0` suffix in their id, so a
-neutral reading and a national-script reading of one field never collide.
+It is reported as `language: "English"`. A reading the engine sends with no
+identifier at all is the same default reading and is reported the same way.
+Its entries carry the `@0` suffix in their id, so a default reading and a
+national-script reading of one field never collide. The suffix, not the
+language string, is what tells them apart.
+
+One entry carries `language: null`: `days_to_expire`, a number computed from
+the expiry date rather than text read in any language.
 
 ## The three steps that resolve it
 
@@ -98,12 +103,12 @@ the identifier.
 
 ## The value a language selects
 
-The language on an entry decides which spelling its `value` carries.
+The identifier on an entry decides which spelling its `value` carries.
 
-| `language` | `value` |
+| Entry | `value` |
 |---|---|
-| `null` | The merged Latin value: the transliterated spelling |
-| A language name | The national-script spelling, as printed |
+| `@0`, `language` `English` | The merged Latin value: the transliterated spelling |
+| Any other identifier, named by its language | The national-script spelling, as printed |
 
 A reading whose national-script spelling matches its transliterated one – a
 document printed only in Latin – produces one entry, not two.
@@ -125,7 +130,7 @@ beside its Latin reading.
 | Georgian | 1079 | `Georgian` |
 | Armenian | 1067 | `Armenian` |
 
-A reading in any of them appears beside the neutral one, not instead of it. A
-consumer that wants the Latin spelling reads the entry whose `language` is
-`null`; one that wants the printed spelling reads the entry that names a
-language.
+A reading in any of them appears beside the default one, not instead of it. A
+consumer that wants the Latin spelling reads the entry whose `id` ends in `@0`,
+named `English`. One that wants the printed spelling reads the entry under the
+national identifier.

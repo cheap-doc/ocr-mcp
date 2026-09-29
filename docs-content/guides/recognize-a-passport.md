@@ -191,7 +191,7 @@ one entry each, rather than choosing for you.
     "label": "Surname",
     "category": "identity",
     "value": "PARADEIGMA",
-    "language": null,
+    "language": "English",
     "confidence": "high"
   },
   {
@@ -208,8 +208,8 @@ one entry each, rather than choosing for you.
 
 - `name` repeats across the two entries; `id` does not. Key your own list on
   `id`.
-- `language` is `null` on the neutral, transliterated reading and names the
-  language on the other.
+- `language` is `English` on the default, transliterated reading and names the
+  national language on the other.
 - `confidence` is a band – `high`, `medium` or `low` – never a number.
 
 `holder.surname` carries the Latin reading. Read the `fields` entry when you
