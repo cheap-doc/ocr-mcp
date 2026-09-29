@@ -23,10 +23,10 @@ in two scripts is two entries, not one entry with two values.
 
 Two keys tell them apart.
 
-- `language` is `null` on the neutral, transliterated Latin reading, and names
-  the language on the other.
+- `language` is `English` on the default, transliterated Latin reading, and
+  names the national language on the other.
 - `id` is `name@lcid`, where the number is the language identifier the reading
-  was made under. `0` is the neutral one.
+  was made under. `0` is the default Latin reading.
 
 ```json
 [
@@ -36,7 +36,7 @@ Two keys tell them apart.
     "label": "Surname",
     "category": "identity",
     "value": "PARADEIGMA",
-    "language": null,
+    "language": "English",
     "confidence": "high"
   },
   {
@@ -130,7 +130,7 @@ The two readings carry different spellings, and the rule is fixed.
 
 | `language` | `value` |
 |---|---|
-| `null` | The merged Latin value, transliterated where the document was not printed in Latin |
+| `English` on an `@0` entry | The merged Latin value, transliterated where the document was not printed in Latin |
 | A language name | The spelling the document prints in that script |
 
 `holder.given_names`, `holder.surname` and `holder.full_name` always carry the
@@ -156,9 +156,11 @@ that narrow.
 Nothing is guessed at any step. A reading never claims a language that the
 number does not support.
 
-Branch on the presence of `language`, not on its exact string. The third step
-exists so that an unrecognized identifier is still reported honestly, and a
-`switch` over language names will meet one eventually.
+Tell the default reading from a national-script one by the identifier in `id`:
+`0` after the `@`. Do not use the language string for it. A document printed in
+English as its own national language would name `English` on both. Do not
+`switch` over language names either. The third step exists so that an unrecognized identifier
+is still reported honestly, and such a `switch` will meet one eventually.
 
 ## Label the readings for a person
 

@@ -78,16 +78,19 @@ export const ScanField = z
       .nullable()
       .meta({
         description:
-          "The value of this reading: the national-script spelling when `language` names " +
-          "one, the transliterated Latin value otherwise. Null when the field is empty.",
+          "The value of this reading: the national-script spelling on a national-script " +
+          "reading, the transliterated Latin value on the default reading (the one whose " +
+          "`id` carries the identifier `0`). Null when the field is empty.",
       }),
     language: z
       .string()
       .nullable()
       .meta({
         description:
-          "The language this reading was made in, e.g. `Greek`; null for the neutral, " +
-          "transliterated Latin reading.",
+          "The language this reading was made in, e.g. `Greek`. The default Latin-script " +
+          "reading – the document's own Latin page and the machine-readable zone, `id` " +
+          "suffix `@0` – is `English`. Null only on `days_to_expire`, a number computed " +
+          "from the expiry date rather than text read in any language.",
         example: "Greek",
       }),
     confidence: ConfidenceBand,

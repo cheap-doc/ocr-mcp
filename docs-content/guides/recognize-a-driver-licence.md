@@ -95,9 +95,9 @@ face like any other document, and `meta.status` comes back `recognized`.
   "quality": { "overall": "pass" },
   "fields": [
     { "id": "dl_class@0", "name": "dl_class", "label": "Driving-licence class",
-      "category": "document", "value": "B, BE", "language": null, "confidence": "high" },
+      "category": "document", "value": "B, BE", "language": "English", "confidence": "high" },
     { "id": "authority@0", "name": "authority", "label": "Issuing authority",
-      "category": "document", "value": "THESSALONIKI REGIONAL OFFICE", "language": null, "confidence": "medium" }
+      "category": "document", "value": "THESSALONIKI REGIONAL OFFICE", "language": "English", "confidence": "medium" }
   ]
 }
 ```
