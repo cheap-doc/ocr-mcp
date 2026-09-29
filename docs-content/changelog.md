@@ -11,6 +11,21 @@ section: Changelog
 Dated, public record of changes to the API and its documentation. The most
 recent change is first.
 
+## 2026-09-29 – 1.47.0, the history pages and a scan can be deleted
+
+`GET /v1/scans` now answers a page at a time. `limit` sets the page size, from
+1 to 100, and `cursor` continues from the `next_cursor` of the previous page,
+which is `null` on the last one. With neither, the first page is the same 100
+rows the list returned before.
+
+[`DELETE /v1/scans/{id}`](/reference/endpoints/delete-a-scan) deletes one
+stored scan before its retention window ends: the result, its history row and
+its thumbnail. It cannot be undone, and the credit the scan drew is not
+returned.
+
+The MCP server gains three tools on top of these: `list_scans`, `get_scan` and
+`delete_scan`.
+
 ## 2026-09-24 – 1.29.2, a damaged image is refused, not a failure
 
 An image that starts like a JPEG or PNG and cannot be decoded, such as a file

@@ -1,4 +1,4 @@
-import { type ScanOptionsInput, ScanStatus } from "./vendor/contracts/reading.ts";
+import { ScanDeletion, ScanList, type ScanOptionsInput, ScanStatus } from "./vendor/contracts/reading.ts";
 import { Scan } from "./vendor/contracts/scan.ts";
 import { Usage } from "./vendor/contracts/usage.ts";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -12,7 +12,7 @@ import { resolveImage } from "./image.ts";
 import { createNoopReporter, type Reporter } from "./observability/reporter.ts";
 import { registerPrompts } from "./prompts.ts";
 import { registerDocResources } from "./resources.ts";
-import { summarizeScan, summarizeUsage } from "./summary.ts";
+import { summarizeScan, summarizeScanList, summarizeUsage } from "./summary.ts";
 import { buildBaggage, buildUserAgent, clientIdentityFrom, doNotTrack } from "./user-agent.ts";
 import { SERVER_NAME, SERVER_VERSION } from "./version.ts";
 
@@ -26,11 +26,12 @@ export { SERVER_NAME, SERVER_VERSION };
 // sentences are what make it look — a user dropping a photo of a passport into
 // a conversation is not obviously a tool call until something says it is.
 //
-// Kept to three sentences on purpose: it is prepended to every conversation
+// Kept to four sentences on purpose: it is prepended to every conversation
 // that mounts this server, so each sentence costs the user context on every
 // turn and has to earn it. What it buys, in order: what the server recognises,
-// when to reach for the expensive tool and what it costs, and where to look
-// things up instead of guessing.
+// when to reach for the expensive tool and what it costs, where to look things
+// up instead of guessing, and that results already made can be found again
+// rather than scanned twice.
 export const SERVER_INSTRUCTIONS =
   "This server recognises identity documents: give it a photo or scan of a passport, " +
   "national ID card or driver's licence and it returns what is printed on the document as " +
@@ -38,7 +39,9 @@ export const SERVER_INSTRUCTIONS =
   "wants it read, transcribed or checked – it draws one credit ($0.01) per document actually " +
   "recognised and nothing at all when the image holds no readable document. Call " +
   "check_balance before working through a batch, and search_docs for field names, error " +
-  "codes, MRZ rules and anything else about the API rather than guessing at them.";
+  "codes, MRZ rules and anything else about the API rather than guessing at them. " +
+  "list_scans, get_scan and delete_scan find, read back and delete results a live key has " +
+  "already stored.";
 
 // What each tool's successful result carries as structured content, declared to
 // the client as the tool's output schema.
@@ -56,6 +59,13 @@ export const SERVER_INSTRUCTIONS =
 // contract names it is dropped here rather than failing the caller's call.
 const ScanOutput = z.object(Scan.shape);
 const UsageOutput = z.object(Usage.shape);
+const ScanListOutput = z.object(ScanList.shape);
+const ScanDeletionOutput = z.object(ScanDeletion.shape);
+
+// The page list_scans asks for when the caller names none. Smaller than the
+// API's own default of a hundred on purpose: every row lands in the model's
+// context, and a first look at a history rarely needs more than the latest few.
+const DEFAULT_LIST_LIMIT = 20;
 const SearchOutput = z.object({
   results: z
     .array(
@@ -143,7 +153,7 @@ function imageInputsSentence(remote: boolean): string {
         "reference and idempotency_key. ";
 }
 
-// Builds the MCP server and registers the three doc-cheap tools. The server is
+// Builds the MCP server and registers the six doc-cheap tools. The server is
 // a thin client of the public HTTP API and the documentation content; it holds
 // no data of its own.
 //
@@ -451,6 +461,206 @@ export function buildServer(
         };
       } catch (error) {
         return failed(error, "search_docs");
+      }
+    },
+  );
+
+  // The stored history: list what is kept, read one result back, delete one.
+  //
+  // All three reach only what the API keeps, and the API keeps a scan only when
+  // it was made with a live key under a non-zero retention window — so under
+  // any sandbox key there is nothing to find. Under the PUBLIC sandbox key
+  // that is known before asking, and asking would spend one of the few
+  // requests an hour the key allows (see `sandboxUsage` for the same reasoning
+  // on check_balance), so the answer is given here. An account's own
+  // `sk_sandbox_` key is not recognisable from here as one, and the API
+  // answers it the same way: an empty list and not found.
+  const NO_STORED_SCANS_UNDER_SANDBOX = remote
+    ? "No API key was sent, so the public demo sandbox key is in use, and nothing made " +
+      "under it is ever stored. Send a live key as `X-Doc-Cheap-Api-Key: <key>` or " +
+      "`Authorization: Bearer <key>` to work with an account's stored scans."
+    : "No API key is configured, so the public demo sandbox key is in use, and nothing made " +
+      "under it is ever stored. Set DOC_CHEAP_API_KEY to a live key to work with an " +
+      "account's stored scans.";
+
+  const STORED_SCANS_SCOPE =
+    "Only scans made with a live key under a non-zero retention window are stored, and only " +
+    "until that window ends (retain_hours on the scan, or the account's history-retention " +
+    "setting, one year by default); a scan made with retain_hours 0 was never stored. " +
+    "A key reaches its own account's scans and no other account's. Under a sandbox key – " +
+    "the public one or an account's own sk_sandbox_ key – nothing is stored.";
+
+  const ScanIdInput = z
+    .string()
+    .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/)
+    .describe(
+      "The scan's id: meta.id of the scan_document result, or id of a list_scans row " +
+        "(a lower-case UUID).",
+    );
+
+  server.registerTool(
+    "list_scans",
+    {
+      title: "List stored scans",
+      description:
+        "List the account's stored scans, most recent first, one page at a time. " +
+        "Inputs: the optional limit (1 to 100 rows, default 20) and cursor (the next_cursor " +
+        "of the previous page; omit it for the first page). " +
+        "Output: scans – one row per scan with id, status (recognized, unreadable, " +
+        "no_document_found, unsupported_document or rejected), billed, duration_ms, reference " +
+        "(your own string from the scan) and created_at – and next_cursor, which is null on " +
+        "the last page. A row holds no extracted data; call get_scan with its id for the full " +
+        "result. Calls GET /v1/scans; it never charges a credit. " +
+        STORED_SCANS_SCOPE +
+        " Under the public sandbox key the answer is an empty list, given without calling the " +
+        "API. Errors: a cursor this API did not issue is refused (validation_failed); a key " +
+        "the API does not know is refused (unauthorized). " +
+        "Use it to find a scan made earlier – by its reference or its time – before reading " +
+        "or deleting it.",
+      annotations: {
+        // A GET over rows the API already holds: nothing is created, charged or
+        // removed. The destructive and idempotent hints are left unstated for
+        // the reason given on check_balance.
+        readOnlyHint: true,
+        // The rows are the account's live history at a remote service, and
+        // they change as scans are made, expire or are deleted.
+        openWorldHint: true,
+      },
+      inputSchema: {
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(100)
+          .optional()
+          .describe("Rows per page, 1 to 100 (default 20)."),
+        cursor: z
+          .string()
+          .min(1)
+          .optional()
+          .describe("next_cursor from the previous page; omit it for the first page."),
+      },
+      outputSchema: ScanListOutput,
+    },
+    async (args, extra) => {
+      try {
+        if (config.usingSandboxKey) {
+          return {
+            structuredContent: { scans: [], next_cursor: null },
+            content: [textContent(NO_STORED_SCANS_UNDER_SANDBOX)],
+          };
+        }
+        const page = ScanListOutput.parse(
+          await api.listScans(
+            {
+              limit: args.limit ?? DEFAULT_LIST_LIMIT,
+              ...(args.cursor !== undefined ? { cursor: args.cursor } : {}),
+            },
+            callContext(extra),
+          ),
+        );
+        return {
+          structuredContent: page as unknown as Record<string, unknown>,
+          content: [
+            textContent(summarizeScanList(page)),
+            textContent(JSON.stringify(page, null, 2)),
+          ],
+        };
+      } catch (error) {
+        return failed(error, "list_scans");
+      }
+    },
+  );
+
+  server.registerTool(
+    "get_scan",
+    {
+      title: "Fetch a stored scan",
+      description:
+        "Fetch the full result of one stored scan by its id, as it was returned when the " +
+        "document was recognised. " +
+        "Input: scan_id – meta.id of a scan_document result, or id of a list_scans row. " +
+        "Output: the same Scan object scan_document returns (meta, document, holder, fields, " +
+        "mrz and the rest) plus a one-line summary, with two differences: the image crops are " +
+        "never stored, so every images slot is null, and quality reads not_checked. " +
+        "Calls GET /v1/scans/{id}; it never re-runs recognition and never charges a credit. " +
+        STORED_SCANS_SCOPE +
+        " Errors: an id that is unknown, belongs to another account, was made with " +
+        "retain_hours 0 or has passed its window is refused as not_found – the cases are not " +
+        "told apart. " +
+        "Use it to read back a document recognised earlier instead of scanning the image again.",
+      annotations: {
+        // A GET of a stored row. Nothing is created, charged or removed.
+        readOnlyHint: true,
+        // The answer is whatever the remote service still holds for that id.
+        openWorldHint: true,
+      },
+      inputSchema: { scan_id: ScanIdInput },
+      outputSchema: ScanOutput,
+    },
+    async (args, extra) => {
+      try {
+        if (config.usingSandboxKey) {
+          throw new ExpectedFailure(NO_STORED_SCANS_UNDER_SANDBOX);
+        }
+        const scan = ScanOutput.parse(await api.getScan(args.scan_id, callContext(extra)));
+        return {
+          structuredContent: scan as unknown as Record<string, unknown>,
+          content: [textContent(summarizeScan(scan)), textContent(JSON.stringify(scan, null, 2))],
+        };
+      } catch (error) {
+        return failed(error, "get_scan");
+      }
+    },
+  );
+
+  server.registerTool(
+    "delete_scan",
+    {
+      title: "Delete a stored scan",
+      description:
+        "Permanently delete one stored scan now, before its retention window would end. " +
+        "This cannot be undone: the stored result, its history row and its thumbnail are " +
+        "removed, and the scan can no longer be listed, fetched or replayed through its " +
+        "idempotency_key. The credit it drew is not refunded, and this period's usage " +
+        "counters still count it. " +
+        "Input: scan_id – meta.id of a scan_document result, or id of a list_scans row. " +
+        "Output: { id, deleted: true }. Calls DELETE /v1/scans/{id}. " +
+        STORED_SCANS_SCOPE +
+        " Errors: an id that is unknown, belongs to another account, has passed its window or " +
+        "was already deleted is refused as not_found, and nothing is deleted. " +
+        "Use it when someone asks for a document's data to be removed; confirm the id with " +
+        "list_scans or get_scan first, because the deletion is final.",
+      annotations: {
+        // It removes data the account holds, which is exactly what a client
+        // should ask its user about before calling.
+        readOnlyHint: false,
+        destructiveHint: true,
+        // A second call with the same id changes nothing further: the scan is
+        // already gone, and the answer is not_found.
+        idempotentHint: true,
+        // The effect lands in a remote service's store.
+        openWorldHint: true,
+      },
+      inputSchema: { scan_id: ScanIdInput },
+      outputSchema: ScanDeletionOutput,
+    },
+    async (args, extra) => {
+      try {
+        if (config.usingSandboxKey) {
+          throw new ExpectedFailure(NO_STORED_SCANS_UNDER_SANDBOX);
+        }
+        const deleted = ScanDeletionOutput.parse(
+          await api.deleteScan(args.scan_id, callContext(extra)),
+        );
+        return {
+          structuredContent: deleted as unknown as Record<string, unknown>,
+          content: [
+            textContent(`Scan ${deleted.id} deleted. It cannot be read, listed or restored.`),
+          ],
+        };
+      } catch (error) {
+        return failed(error, "delete_scan");
       }
     },
   );

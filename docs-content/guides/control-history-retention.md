@@ -219,8 +219,42 @@ Only scans made with a live key under a non-zero window are listed, and only
 while that window lasts. A sandbox key sees an empty list rather than the
 account's.
 
+The list comes a page at a time. `limit` sets the page size, from 1 to 100,
+and defaults to 100. Each page carries `next_cursor`: send it back as `cursor`
+to read the next page. It is `null` on the last one.
+
+```bash
+curl "https://api.doc.cheap/v1/scans?limit=20" \
+  -H "Authorization: Bearer sk_live_your_key"
+```
+
+A `limit` outside the range, or a cursor this API did not issue, is refused
+with 422 [`validation_failed`](/errors/validation_failed) rather than quietly
+answered with a different page.
+
 The extracted data and the crops are not in a row. Read one scan back by id
 when you need them.
+
+## Delete a result before its window ends
+
+`DELETE /v1/scans/{id}` removes one stored scan now: the result, its history
+row and its thumbnail. Only a live key deletes, and only its own account's
+scans. It answers with the id and `"deleted": true`.
+
+```bash
+curl -X DELETE https://api.doc.cheap/v1/scans/01a0af18-cd8d-7a61-9f2d-4c7b8e105da3 \
+  -H "Authorization: Bearer sk_live_your_key"
+```
+
+The deletion is final. The scan can no longer be read, listed or replayed.
+For 24 hours, a retry under the `Idempotency-Key` that created it answers 409
+[`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable).
+It does not recognize the image again. The credit the scan drew is not
+returned.
+
+An id that was never stored, belongs to another account, has passed its window
+or was already deleted answers 404 [`not_found`](/errors/not_found). A sandbox
+key answers 404 for every id.
 
 ## Choose a window for the job
 

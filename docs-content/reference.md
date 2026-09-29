@@ -25,9 +25,11 @@ host the contract's `servers` block declares.
 | [API reference](/reference/api) | The whole of `openapi.yaml`, rendered in the browser |
 | [POST /v1/scans](/reference/endpoints/create-a-scan) | Request fields, headers, every response status and the codes it can answer with |
 | [GET /v1/scans/{id}](/reference/endpoints/retrieve-a-scan) | The path parameter, the stored result and when it is gone |
+| [GET /v1/scans](/reference/endpoints/list-scans) | The stored history, a page at a time, and how to read the next page |
+| [DELETE /v1/scans/{id}](/reference/endpoints/delete-a-scan) | Deleting a stored scan before its window ends, and what it does not give back |
 | [GET /v1/usage](/reference/endpoints/get-usage) | The balance and the counters for the current period |
 
-These four are rendered from `openapi.yaml` at build time. The contract is the
+These pages are rendered from `openapi.yaml` at build time. The contract is the
 source. The schemas and the routes produce it, and the pages are produced from
 it, so neither can drift from the running service.
 

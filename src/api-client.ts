@@ -1,4 +1,4 @@
-import type { ScanOptionsInput } from "./vendor/contracts/reading.ts";
+import type { ScanDeletion, ScanList, ScanOptionsInput } from "./vendor/contracts/reading.ts";
 import type { Scan } from "./vendor/contracts/scan.ts";
 import type { Usage } from "./vendor/contracts/usage.ts";
 import type { McpConfig } from "./config.ts";
@@ -33,9 +33,19 @@ export interface CallContext {
   readonly clientAddress?: string | null;
 }
 
+// One page of the stored history to ask for: its size, and where the previous
+// page ended. Both optional, as they are on the API.
+export interface ScanPageInput {
+  readonly limit?: number;
+  readonly cursor?: string;
+}
+
 export interface ApiClient {
   createScan(input: ScanInput, context?: CallContext): Promise<Scan>;
   getUsage(context?: CallContext): Promise<Usage>;
+  listScans(page: ScanPageInput, context?: CallContext): Promise<ScanList>;
+  getScan(id: string, context?: CallContext): Promise<Scan>;
+  deleteScan(id: string, context?: CallContext): Promise<ScanDeletion>;
 }
 
 interface ApiErrorBody {
@@ -133,6 +143,46 @@ export function createApiClient(config: McpConfig): ApiClient {
         throw new ExpectedFailure(`Usage lookup failed – ${await describeError(response)}`);
       }
       return (await response.json()) as Usage;
+    },
+
+    async listScans(page, context) {
+      const query = new URLSearchParams();
+      if (page.limit !== undefined) query.set("limit", String(page.limit));
+      if (page.cursor !== undefined) query.set("cursor", page.cursor);
+      const suffix = query.size > 0 ? `?${query.toString()}` : "";
+      const response = await request(`/v1/scans${suffix}`, {
+        headers: withContext(baseHeaders, context),
+      });
+      if (!response.ok) {
+        throw new ExpectedFailure(`Listing scans failed – ${await describeError(response)}`);
+      }
+      return (await response.json()) as ScanList;
+    },
+
+    // The id is encoded rather than trusted: the tool's schema already holds
+    // it to the id pattern, and this keeps a value that somehow was not from
+    // addressing any path but the one scan's.
+    async getScan(id, context) {
+      const response = await request(`/v1/scans/${encodeURIComponent(id)}`, {
+        headers: withContext(baseHeaders, context),
+      });
+      if (!response.ok) {
+        throw new ExpectedFailure(`Fetching the scan failed – ${await describeError(response)}`);
+      }
+      return (await response.json()) as Scan;
+    },
+
+    async deleteScan(id, context) {
+      // No content type: a DELETE carries no body, and a JSON content type
+      // with an empty body is refused by the API's body parser as malformed.
+      const response = await request(`/v1/scans/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: withContext({ authorization: baseHeaders.authorization as string }, context),
+      });
+      if (!response.ok) {
+        throw new ExpectedFailure(`Deleting the scan failed – ${await describeError(response)}`);
+      }
+      return (await response.json()) as ScanDeletion;
     },
   };
 }

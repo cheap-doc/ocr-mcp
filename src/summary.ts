@@ -1,3 +1,4 @@
+import type { ScanList } from "./vendor/contracts/reading.ts";
 import type { Scan } from "./vendor/contracts/scan.ts";
 import type { Usage } from "./vendor/contracts/usage.ts";
 
@@ -33,6 +34,26 @@ export function summarizeUsage(usage: Usage): string {
   parts.push(
     `${usage.scans.total} scans this period ` +
       `(${usage.scans.billed} billed, ${usage.credits_spent} credits spent).`,
+  );
+  return parts.join(" · ");
+}
+
+// A one-line human summary of a page of stored scans: how many rows, the span
+// they cover, and whether there is another page — the three things a model
+// needs to decide whether to read on.
+export function summarizeScanList(page: ScanList): string {
+  const count = page.scans.length;
+  if (count === 0) {
+    return page.next_cursor === null
+      ? "No stored scans."
+      : "No stored scans on this page; pass next_cursor for the next one.";
+  }
+  const newest = page.scans[0]?.created_at;
+  const oldest = page.scans[count - 1]?.created_at;
+  const parts = [`${count} stored scan${count === 1 ? "" : "s"}`, `newest ${newest}`];
+  if (count > 1) parts.push(`oldest ${oldest}`);
+  parts.push(
+    page.next_cursor === null ? "no more pages" : "more on the next page (pass next_cursor)",
   );
   return parts.join(" · ");
 }
