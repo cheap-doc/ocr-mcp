@@ -442,6 +442,56 @@ export const ScanList = z
     scans: z.array(ScanSummary).meta({
       description: "The account's scans, most recent first.",
     }),
+    next_cursor: z
+      .string()
+      .nullable()
+      .meta({
+        description:
+          "Opaque cursor for the next page: send it back as `cursor` to continue after the " +
+          "last row of this one. Null on the last page.",
+      }),
   })
   .meta({ id: "ScanList" });
 export type ScanList = z.infer<typeof ScanList>;
+
+// The answer to deleting a stored scan: which one went. A body rather than an
+// empty 204 so a caller, or a tool relaying the answer, has something to read
+// back that names what was removed.
+export const ScanDeletion = z
+  .object({
+    id: ScanId,
+    deleted: z.literal(true).meta({
+      description: "Always true: the stored result is gone and cannot be read back.",
+    }),
+  })
+  .meta({ id: "ScanDeletion" });
+export type ScanDeletion = z.infer<typeof ScanDeletion>;
+
+// The query `GET /v1/scans` pages with. `limit` arrives as text in a query
+// string, so it is coerced before it is checked; a value outside the range is
+// refused rather than clamped, so a caller never reads a page of a size it did
+// not ask for without knowing it.
+export const SCAN_LIST_MAX_LIMIT = 100;
+export const ScanListQuery = z.object({
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(SCAN_LIST_MAX_LIMIT)
+    .optional()
+    .meta({
+      description: `How many rows to return, 1 to ${SCAN_LIST_MAX_LIMIT}. Defaults to ${SCAN_LIST_MAX_LIMIT}.`,
+      example: 20,
+    }),
+  cursor: z
+    .string()
+    .min(1)
+    .max(256)
+    .optional()
+    .meta({
+      description:
+        "The `next_cursor` of the previous page. Omit it for the first page. A cursor is " +
+        "read only against the key's own account.",
+    }),
+});
+export type ScanListQuery = z.infer<typeof ScanListQuery>;

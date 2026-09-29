@@ -35,7 +35,14 @@ export const KNOWN_METHODS: readonly string[] = [
 ];
 
 /** The tools this server registers (server.ts). */
-export const KNOWN_TOOLS: readonly string[] = ["scan_document", "check_balance", "search_docs"];
+export const KNOWN_TOOLS: readonly string[] = [
+  "scan_document",
+  "check_balance",
+  "search_docs",
+  "list_scans",
+  "get_scan",
+  "delete_scan",
+];
 
 export type McpCaller = "own-key" | "sandbox" | "none";
 

@@ -1,6 +1,6 @@
 ---
 title: Use the MCP server
-description: Install the MCP server with npx so a coding assistant can recognize a passport or ID, check the balance and search these docs from your editor.
+description: Install the MCP server with npx so a coding assistant can recognize a passport or ID, check the balance, work with stored scans and search these docs.
 type: how-to
 keyword: mcp server document recognition
 nav: Use the MCP server
@@ -9,8 +9,9 @@ section: Guides
 
 # Use the MCP server
 
-The MCP server gives an assistant three tools against this API: recognize a
-document, read the balance, search the documentation. This guide covers
+The MCP server gives an assistant six tools against this API. They recognize
+a document, read the balance and search the documentation. They also list,
+read back and delete the scans an account has stored. This guide covers
 installing it in each client, what each tool does, and the two image sources
 that are fenced in.
 
@@ -20,7 +21,7 @@ as a command. One recognized document costs one credit, $0.01.
 
 ## Connect to the hosted server
 
-The same three tools are hosted at `https://mcp.doc.cheap/mcp` over Streamable
+The same six tools are hosted at `https://mcp.doc.cheap/mcp` over Streamable
 HTTP, for a client that connects to a URL rather than launching a command. No
 login is needed. Send your key as `X-Doc-Cheap-Api-Key: sk_live_your_key` or
 `Authorization: Bearer sk_live_your_key`. The named header wins when both are
@@ -152,7 +153,7 @@ Everything is optional, and every default is a working setting.
 With no key set, the server uses the public sandbox key. Without a key, the public sandbox key is used. It gives 10 free recognised documents per address in all, and at most 10 requests per address an hour, whatever their answer. Registering gives 100 free documents every month. It has no
 balance to report, so `check_balance` answers without calling the API.
 
-## Use the three tools
+## Use the six tools
 
 Each tool carries a title and the behaviour hints an MCP client reads before
 it decides whether to ask you first.
@@ -162,6 +163,9 @@ it decides whether to ask you first.
 | `scan_document` | Recognise a passport or ID document | `false` | `true` | `POST /v1/scans` |
 | `check_balance` | Check remaining credits | `true` | `true` | `GET /v1/usage` |
 | `search_docs` | Search the doc.cheap API documentation | `true` | `false` | Nothing; reads the bundled docs |
+| `list_scans` | List stored scans | `true` | `true` | `GET /v1/scans` |
+| `get_scan` | Fetch a stored scan | `true` | `true` | `GET /v1/scans/{id}` |
+| `delete_scan` | Delete a stored scan | `false` | `true` | `DELETE /v1/scans/{id}` |
 
 `scan_document` also declares `destructiveHint: false` and
 `idempotentHint: true`. The second is true because of `idempotency_key`: a
@@ -191,10 +195,37 @@ rather than showing zeros that look like a reading.
 defaulting to 5. It reads a copy of this documentation shipped beside the
 server, so it works with no network.
 
+`list_scans`, `get_scan` and `delete_scan` work with the scans the account has
+stored. A scan is stored only when it was made with a live key under a
+non-zero retention window, and only until that window ends. A key reaches its
+own account's scans and no other's. Under a sandbox key nothing is stored:
+the list is empty, and a lookup or a deletion answers `not_found`. None of the
+three charges a credit.
+
+- `list_scans` takes an optional `limit` from 1 to 100, defaulting to 20, and
+  the `cursor` from the previous page's `next_cursor`. Each row carries the id,
+  status, `billed`, the duration, your `reference` and the creation time. It
+  holds no extracted data.
+- `get_scan` takes a `scan_id` and returns the whole `Scan` as it was first
+  returned. The image crops are never stored, so every `images` slot is `null`,
+  and `quality` reads `not_checked`. It never recognizes the image again.
+- `delete_scan` takes a `scan_id` and deletes that scan for good: the result,
+  its history row and its thumbnail. It cannot be undone, and the credit it
+  drew is not returned. It declares `destructiveHint: true`, so a client that
+  honours the hint asks you before it runs.
+
 Every tool declares an output schema. A successful call returns structured
-content that matches it: the `Scan` for `scan_document`, the `Usage` for
-`check_balance`, and a `results` list for `search_docs`. A failed call returns
-an error block and no structured content.
+content that matches it.
+
+| Tool | Structured content |
+|---|---|
+| `scan_document`, `get_scan` | The `Scan` |
+| `check_balance` | The `Usage` |
+| `list_scans` | A page of `scans`, with `next_cursor` |
+| `delete_scan` | The `id`, with `deleted: true` |
+| `search_docs` | A `results` list |
+
+A failed call returns an error block and no structured content.
 
 ## Read the docs as resources
 
@@ -225,7 +256,9 @@ If you are an agent reading this page: call `scan_document` with
 `image_base64` when a user shares an identity document and wants it read,
 transcribed or checked. Call `check_balance` before a batch. Call
 `search_docs` for field names, error codes and MRZ rules rather than guessing
-them.
+them. Call `list_scans` and `get_scan` to find a document read earlier rather
+than scanning it again, and `delete_scan` only when the user asks for a result
+to be removed.
 
 ## Enable local files deliberately
 

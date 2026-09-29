@@ -21,7 +21,7 @@ npx -y @doc-cheap/mcp
 
 ## Hosted – nothing to install
 
-`https://mcp.doc.cheap/mcp` serves the same three tools over Streamable HTTP. No
+`https://mcp.doc.cheap/mcp` serves the same six tools over Streamable HTTP. No
 login: send your key as `X-Doc-Cheap-Api-Key: sk_live_your_key` or
 `Authorization: Bearer sk_live_your_key` – the named header wins when both are
 sent, and an `Authorization` that is not a doc.cheap key is ignored rather than
@@ -227,6 +227,9 @@ effect on the client's next launch.
 | `scan_document` | Recognise a passport or ID document | no | yes |
 | `check_balance` | Check remaining credits | yes | yes |
 | `search_docs` | Search the doc.cheap API documentation | yes | no |
+| `list_scans` | List stored scans | yes | yes |
+| `get_scan` | Fetch a stored scan | yes | yes |
+| `delete_scan` | Delete a stored scan – cannot be undone | no | yes |
 
 ### `scan_document`
 
@@ -284,10 +287,47 @@ codes, MRZ rules, retention, pricing – returning the matching sections with
 titles, snippets and links. It reads a copy shipped inside this package, so it
 makes no network call.
 
+### Stored scans: `list_scans`, `get_scan`, `delete_scan`
+
+A result is stored only when the scan was made with a live key under a
+non-zero retention window – `retain_hours` on the call, or the account's
+history-retention setting (one year by default) when the call named none – and
+only until that window ends. A key reaches its own account's scans and no
+other's. Under a sandbox key nothing is stored, so the list is empty and a
+lookup or a deletion finds nothing; with the public sandbox key the server
+says so without calling the API. None of the three charges a credit.
+
+`list_scans` returns the stored scans, newest first, one page at a time:
+
+```json
+{ "limit": 20 }
+```
+
+Each row carries `id`, `status`, `billed`, `duration_ms`, `reference` and
+`created_at`, and the page carries `next_cursor` – pass it back as `cursor` for
+the next page; it is `null` on the last one. `limit` is 1 to 100 and defaults
+to 20. A row holds no extracted data.
+
+`get_scan` takes a `scan_id` – `meta.id` of a `scan_document` result, or `id`
+of a row – and returns the full `Scan` as it was first returned, except that
+the image crops are never stored (every `images` slot is `null`) and `quality`
+reads `not_checked`. It never recognises the image again.
+
+`delete_scan` takes a `scan_id` and **permanently** deletes that stored scan –
+the result, its history row and its thumbnail. It cannot be undone: the scan
+can no longer be listed, fetched or replayed through its `idempotency_key`. The
+credit it drew is not refunded. It answers `{ "id": "…", "deleted": true }`.
+
+An id that is unknown, belongs to another account, was made with
+`retain_hours: 0` or has passed its window is `not_found` for both tools; the
+cases are not told apart.
+
 Every tool declares an output schema, and every successful call returns
 `structuredContent` that matches it, beside the text blocks: the API's `Scan`
-for `scan_document`, its `Usage` for `check_balance`, and `{ "results": [...] }`
-for `search_docs`. A failed call is an error block with no structured content.
+for `scan_document` and `get_scan`, its `Usage` for `check_balance`, a page of
+`{ "scans": [...], "next_cursor": … }` for `list_scans`, `{ "id", "deleted" }`
+for `delete_scan`, and `{ "results": [...] }` for `search_docs`. A failed call
+is an error block with no structured content.
 
 ## Resources
 
@@ -356,7 +396,7 @@ When it calls the doc.cheap API it identifies itself in the request's
 `User-Agent`, the way any HTTP client does:
 
 ```
-doc-cheap-mcp/0.3.7 (claude-code/1.4.2)
+doc-cheap-mcp/0.3.8 (claude-code/1.4.2)
 ```
 
 The first half is this package and its version. The second half is **the name
@@ -368,7 +408,7 @@ actually are. It is never used to change what the server does, and nothing else
 about you, your prompts, your files or your images travels with it.
 
 **Switching it off:** set `DO_NOT_TRACK=1` in the server's environment. The
-request then carries `doc-cheap-mcp/0.3.7` and nothing more – no client name, no
+request then carries `doc-cheap-mcp/0.3.8` and nothing more – no client name, no
 client version, no `baggage` header – and everything else works identically.
 
 Your API key already identifies your account to the API; that is what a key is
@@ -386,7 +426,8 @@ The full policy is <https://doc.cheap/privacy>. What it says about this server:
   in memory for the length of the request. The **result** – the fields read off
   the document – is kept for the window the call asked for in `retain_hours`
   (`0` stores nothing) or, when it asked for none, for the account's
-  history-retention setting, which defaults to one year; expiry deletes it.
+  history-retention setting, which defaults to one year; expiry deletes it, and
+  `delete_scan` deletes one result sooner.
 - **Who else sees it.** Nobody the policy does not name: the hosting provider
   and the network provider that carry the traffic. Nothing is sold or shared
   for advertising. Nothing this server does is reported anywhere unless you set

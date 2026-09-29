@@ -125,6 +125,12 @@ A shortened window is the case that makes the tombstone necessary. A row the
 change has pushed past its window is deleted now, and its picture is enqueued
 for deletion now. Neither waits out the tier the object was written under.
 
+One scan can also be deleted on request, before its window ends. A live key
+sends `DELETE /v1/scans/{id}`. That removes the row and queues its picture in
+one statement, the same way. It is final. The credit the scan drew stays
+spent, and the period's usage counters keep counting it. They are a record of
+work done, not of what is kept.
+
 ## Why the default is long and the override is short
 
 The account default is the longest window the service offers, and a request
