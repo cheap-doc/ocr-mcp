@@ -92,6 +92,13 @@ print(scan["meta"]["id"], scan["meta"]["created_at"])
 The window runs from `meta.created_at`, not from the last read. Reading a
 result does not extend it.
 
+> **Note.** The examples run on the public sandbox key so they work as printed,
+> but that key does not apply `retain_hours`. Every scan made on it is kept for
+> one year with its thumbnail, whatever the request names. It cannot be read
+> back, listed or deleted through the API. The window you name takes
+> effect on your own live key. See [the public sandbox
+> key](/concepts/data-retention-and-privacy#the-public-sandbox-key-keeps-every-scan-for-a-year).
+
 ## Keep nothing at all
 
 Send `retain_hours: 0`. No row is written, so nothing expires and nothing has
@@ -149,8 +156,9 @@ with urllib.request.urlopen(request) as response:
 print(scan["meta"]["billed"], scan["holder"]["full_name"])
 ```
 
-A zero-retention scan is still charged and still counted in usage. What it does
-not do is leave a row behind.
+A zero-retention scan on a live key is still charged and still counted in
+usage. What it does not do is leave a row behind. On the public sandbox key
+`0` is not applied: the scan is kept for one year, as the note above says.
 
 > **Warning.** `retain_hours: 0` also removes the replay an
 > `Idempotency-Key` would have served. For 24 hours a retry under the same key

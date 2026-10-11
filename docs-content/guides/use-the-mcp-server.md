@@ -245,7 +245,7 @@ The server offers four prompts. Each one drives the tools above.
 | `batch_scan` | `image_urls` | Check the balance, scan each address, then list the failures |
 | `explain_error` | `error_code` | Explain an error code from its documentation page |
 
-## For AI agents
+## For agents
 
 The server introduces itself with instructions the model reads before any
 call. They say what it recognizes, when to reach for `scan_document`, and what

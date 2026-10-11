@@ -28,6 +28,7 @@ host the contract's `servers` block declares.
 | [GET /v1/scans](/reference/endpoints/list-scans) | The stored history, a page at a time, and how to read the next page |
 | [DELETE /v1/scans/{id}](/reference/endpoints/delete-a-scan) | Deleting a stored scan before its window ends, and what it does not give back |
 | [GET /v1/usage](/reference/endpoints/get-usage) | The balance and the counters for the current period |
+| [POST /v1/client-tokens](/reference/endpoints/create-a-client-token) | A short-lived token an app can scan with, and its limits |
 
 These pages are rendered from `openapi.yaml` at build time. The contract is the
 source. The schemas and the routes produce it, and the pages are produced from
@@ -48,7 +49,7 @@ it, so neither can drift from the running service.
 | Page | What it states |
 |---|---|
 | [Scan options](/reference/scan-options) | The six options, their defaults and their ranges |
-| [Errors](/reference/errors) | All 21 codes, including the three no public call can raise |
+| [Errors](/reference/errors) | All 24 codes, including the three no public call can raise |
 | [Limits](/reference/limits) | Every ceiling a caller meets, and the code each one answers with |
 | [HTTP status codes](/reference/http-status-codes) | Which codes share a status, and what separates them |
 | [Idempotency](/reference/idempotency) | What makes two requests the same request |
@@ -60,7 +61,7 @@ it, so neither can drift from the running service.
 
 The error pages are the clearest case. Their set comes from the `ErrorCode`
 enum in the contract, not from a list beside it. A code with no page fails the
-build, and a page whose name is not a code fails it too. All 21 codes therefore have a
+build, and a page whose name is not a code fails it too. All 24 codes therefore have a
 page, including the three raised only on internal surfaces. A `docs_url` that
 answers 404 is worse than a short page.
 

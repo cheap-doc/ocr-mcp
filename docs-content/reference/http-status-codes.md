@@ -11,8 +11,8 @@ verified: 1.0.2
 # HTTP status codes
 
 The status groups a failure; it does not identify one. Four error codes share
-409, three share 503 and two share 429, and what to do differs inside each
-group.
+409, three share 401 and 503, and two share 429, and what to do differs inside
+each group.
 
 Branch on `error.code`, which is stable and named in the contract. The status is
 what a proxy, a load balancer and a metrics dashboard read.
@@ -23,9 +23,9 @@ what a proxy, a load balancer and a metrics dashboard read.
 |---|---|---|
 | 200 | – | Not an error; `meta.status` says how far recognition got |
 | 400 | [`invalid_request`](/errors/invalid_request) | No, until the request changes |
-| 401 | [`unauthorized`](/errors/unauthorized) | No |
+| 401 | [`unauthorized`](/errors/unauthorized), [`client_token_expired`](/errors/client_token_expired), [`client_token_used_up`](/errors/client_token_used_up) | With a new token, for the two token codes; otherwise no |
 | 402 | [`insufficient_credits`](/errors/insufficient_credits) | After a top-up |
-| 403 | [`registration_required`](/errors/registration_required), [`impersonation_read_only`](/errors/impersonation_read_only) | No |
+| 403 | [`registration_required`](/errors/registration_required), [`client_token_not_allowed`](/errors/client_token_not_allowed), [`impersonation_read_only`](/errors/impersonation_read_only) | No |
 | 404 | [`not_found`](/errors/not_found) | No |
 | 409 | [`idempotency_conflict`](/errors/idempotency_conflict), [`idempotency_in_progress`](/errors/idempotency_in_progress), [`idempotency_replay_unavailable`](/errors/idempotency_replay_unavailable), [`topup_in_progress`](/errors/topup_in_progress) | Depends on the code |
 | 413 | [`payload_too_large`](/errors/payload_too_large) | No, until the image is smaller |
@@ -65,6 +65,17 @@ once when it does.
 `rate_unavailable` is a fourth 503, and it belongs to crypto top-ups rather
 than to recognition. Fewer than two price sources agreed, so no amount could be
 quoted.
+
+## The three 401s
+
+| Code | What happened | What to do |
+|---|---|---|
+| [`unauthorized`](/errors/unauthorized) | No usable API key or client token | Fix the header or the key |
+| [`client_token_expired`](/errors/client_token_expired) | A client token passed its expiry | Ask your server for a new token |
+| [`client_token_used_up`](/errors/client_token_used_up) | A client token has no uses left | Ask your server for a new token |
+
+The two token codes come only from `POST /v1/scans`, the one endpoint a
+[client token](/concepts/api-keys-and-sessions) can call.
 
 ## The four 409s
 

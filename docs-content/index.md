@@ -59,7 +59,7 @@ that comes back.
   fix.
 - [Changelog](/changelog) – dated list of changes, with a feed.
 
-## For AI coding agents
+## For coding agents
 
 Machine-readable copies of this site live at [/llms.txt](/llms.txt) (a short
 index) and [/llms-full.txt](/llms-full.txt) (every page as one markdown file).

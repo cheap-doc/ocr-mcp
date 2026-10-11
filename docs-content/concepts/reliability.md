@@ -156,7 +156,7 @@ it on the second attempt too. A validation failure names the field that has to
 change.
 
 The two classes are separated in the error catalogue rather than left to
-judgement. [Handle errors](/guides/handle-errors) sorts all 21 codes into
+judgement. [Handle errors](/guides/handle-errors) sorts all 24 codes into
 retry, fix, or stop.
 
 ## What is promised, and what is only measured

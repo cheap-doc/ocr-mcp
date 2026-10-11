@@ -14,8 +14,11 @@ thing this service will ever be handed. What is kept of it, and for how long,
 is therefore a design decision rather than an operational detail. This page is
 the reasoning behind the one that was taken.
 
-The short version. The picture is never written down. The extracted result is
-kept for as long as the request asked for, and a request may ask for nothing.
+The short version. The picture is never written down. On an account's live
+key the extracted result is kept for as long as the request asked for. A
+request may ask for nothing. A scan made on the public sandbox key is the
+exception: it is always kept for one year, as described
+[below](#the-public-sandbox-key-keeps-every-scan-for-a-year).
 
 ## The image is never stored
 
@@ -74,7 +77,7 @@ it.
 
 ## Zero retention writes nothing
 
-A request carrying `retain_hours: 0` produces no row at all.
+A request on a live key carrying `retain_hours: 0` produces no row at all.
 
 That is a stronger statement than a row that expires immediately. Nothing is
 left to expire, nothing for a sweep to find, nothing in a backup taken that
@@ -131,6 +134,26 @@ one statement, the same way. It is final. The credit the scan drew stays
 spent, and the period's usage counters keep counting it. They are a record of
 work done, not of what is kept.
 
+## The public sandbox key keeps every scan for a year
+
+The public sandbox key, `sk_sandbox_public`, belongs to no account, and its
+scans are kept on different terms. Every scan made on it is written down for
+the service's own log. It has no account, and the address the request came
+from stands in place of one.
+
+What is kept is the same as for a retained scan: the reading, the `billed`
+verdict and the micro thumbnail beside it. It is kept for **one year**, the
+default history window, counted from the scan. `retain_hours` is not applied
+on this key, so neither a shorter window nor `0` changes it.
+
+The key cannot read, list or delete what it stored: `GET /v1/scans/{id}` and
+`DELETE /v1/scans/{id}` answer 404, and the list is empty. The same sweep
+described above deletes the row and its thumbnail when the year is up.
+
+An account's own sandbox key is the opposite case. It answers from a fixed
+synthetic specimen and stores nothing at all. Because the public key keeps a
+record of every scan, send it a test image, never a real document.
+
 ## Why the default is long and the override is short
 
 The account default is the longest window the service offers, and a request
@@ -165,7 +188,9 @@ The free sandbox has one more store, and it is the smallest one in the
 service. To stop one image being replayed endlessly on a free key, a digest of
 the image bytes is held briefly. A digest is not the image and cannot be
 turned back into one. It lives in an in-memory store with a short expiry, and
-no durable row is written for it.
+no durable row is written for it. The scan itself is a separate record, kept
+as described in [the section on the public sandbox
+key](#the-public-sandbox-key-keeps-every-scan-for-a-year).
 
 ## What this is not
 

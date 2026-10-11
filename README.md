@@ -1,4 +1,4 @@
-# doc.cheap MCP server – passport, ID card and MRZ OCR for AI agents
+# doc.cheap MCP server – passport, ID card and MRZ OCR for MCP clients
 
 [![MCP Registry](https://img.shields.io/badge/MCP_Registry-cheap.doc%2Fmcp-0f172a)](https://registry.modelcontextprotocol.io/v0.1/servers?search=cheap.doc)
 [![Smithery](https://img.shields.io/badge/Smithery-doc--cheap%2Focr--mcp-0f172a)](https://smithery.ai/servers/doc-cheap/ocr-mcp)
@@ -396,7 +396,7 @@ When it calls the doc.cheap API it identifies itself in the request's
 `User-Agent`, the way any HTTP client does:
 
 ```
-doc-cheap-mcp/0.3.9 (claude-code/1.4.2)
+doc-cheap-mcp/0.3.10 (claude-code/1.4.2)
 ```
 
 The first half is this package and its version. The second half is **the name
@@ -408,7 +408,7 @@ actually are. It is never used to change what the server does, and nothing else
 about you, your prompts, your files or your images travels with it.
 
 **Switching it off:** set `DO_NOT_TRACK=1` in the server's environment. The
-request then carries `doc-cheap-mcp/0.3.9` and nothing more – no client name, no
+request then carries `doc-cheap-mcp/0.3.10` and nothing more – no client name, no
 client version, no `baggage` header – and everything else works identically.
 
 Your API key already identifies your account to the API; that is what a key is

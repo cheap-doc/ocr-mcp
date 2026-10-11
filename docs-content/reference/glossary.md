@@ -111,8 +111,10 @@ Not a test key or a dev key.
 
 **Public sandbox key.** `sk_sandbox_public`, the one printed in every example.
 No account, never billed, and it **runs real recognition on the image it is
-sent**. A lifetime free allowance and a rate limit per address bound it. Not a
-demo key, a trial key or an anonymous key.
+sent**. A lifetime free allowance and a rate limit per address bound it. Every
+scan made on it is kept for one year, with a thumbnail and the address it came
+from, and `retain_hours` is not applied. Not a demo key, a trial key or an
+anonymous key.
 
 **Session.** How the dashboard identifies a person, as against how an API key
 identifies an integration. The two surfaces are kept apart on purpose.
