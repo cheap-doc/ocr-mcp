@@ -86,8 +86,14 @@ reached, the anonymous path answers a retryable 503 rather than letting
 unmetered free recognition through. A registered key is unaffected; it is
 metered by its own balance.
 
-Because the key is published, the recognitions it produces are never stored.
-No account exists for them to belong to.
+Every recognition made on the public key **is stored**, for the service's own
+log. The scan is written down with no account and with the address it came
+from in place of one. The record keeps the result, the `billed` verdict and a
+non-readable micro thumbnail of the image. It is kept for **one year**, the
+default history window. `retain_hours` is not applied on this key, so `0` does
+not turn the record off. The key itself cannot read, list or delete what it
+stored, and the retention sweep deletes the record when its year is up. Send
+the public key a test image, never a real document.
 
 ## An account's own sandbox key
 
@@ -123,6 +129,35 @@ Everything a live key can do is a reason to treat it as a secret. It spends
 money, and it opens a history of identity documents. An account may hold
 several, which is what makes it possible to replace one without a gap. [Rotate
 API keys](/guides/rotate-api-keys) is that procedure.
+
+## Client tokens: a key's stand-in for one upload
+
+A browser or a mobile app cannot keep a secret. Anything shipped inside it can
+be read by whoever installs it, so a key placed there is a key given away.
+
+A client token solves that. Your server calls `POST /v1/client-tokens` with
+its key and hands the app the token it gets back. The app sends the scan
+straight to this API with the token, and the key never leaves the server.
+
+A token is deliberately small:
+
+- It can call `POST /v1/scans` and nothing else. Any other endpoint answers
+  [`client_token_not_allowed`](/errors/client_token_not_allowed).
+- It lives 300 seconds unless asked otherwise, anywhere from 10 to 900.
+- It allows one scan request unless asked otherwise, at most 10. Every request
+  made with it spends a use, whatever the outcome.
+- Past its expiry it answers [`client_token_expired`](/errors/client_token_expired);
+  with no uses left, [`client_token_used_up`](/errors/client_token_used_up).
+
+Everywhere else it behaves exactly as the key that issued it. Its scans are
+billed, stored and rate-limited as that key's own. A sandbox key issues
+sandbox tokens, and the public sandbox key issues tokens that keep every wall
+of the public key. Revoking or deleting the key ends every token it issued at
+once.
+
+A token is returned once, and only a hash of it is kept, as with a key.
+[Read a passport in an Ionic app](/guides/read-a-passport-in-an-ionic-app)
+shows the whole exchange.
 
 ## Why the three exist rather than one
 

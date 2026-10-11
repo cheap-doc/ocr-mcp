@@ -36,6 +36,20 @@ Over either, the answer is 429
 **The sandbox bucket is keyed by address, not by key.** Everyone shares one
 credential there, so counting per key would count everybody as one caller.
 
+**A client token counts against the key that issued it.** Its requests share
+that key's bucket. A token from the public sandbox key shares the public key's
+bucket for the caller's address.
+
+## Client tokens
+
+| Limit | Figure | Answered with |
+|---|---|---|
+| Lifetime of a [client token](/reference/endpoints/create-a-client-token) | 10 to 900 seconds, 300 by default | 401 [`client_token_expired`](/errors/client_token_expired) |
+| Scan requests per client token | 1 to 10, 1 by default | 401 [`client_token_used_up`](/errors/client_token_used_up) |
+| Endpoints a client token can call | `POST /v1/scans` only | 403 [`client_token_not_allowed`](/errors/client_token_not_allowed) |
+
+These are part of the contract and not configurable.
+
 ## The free allowances
 
 Two separate allowances govern the public sandbox key, and both apply.

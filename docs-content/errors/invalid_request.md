@@ -18,6 +18,11 @@ The web framework refused the request before any handler ran, and the refusal
 was not one of the cases with a code of its own. A body that is not valid JSON
 is the common one; a method the route does not serve is another.
 
+An empty body on a request that takes none – a `GET` or a `DELETE` – is not
+this error, even when the request says `Content-Type: application/json`. It is
+read as no body, and the endpoint answers as usual. On a `POST`, an empty JSON
+body is still `invalid_request`: the document the endpoint needs is missing.
+
 The message is deliberately fixed, and what threw stays in the service's own
 log. Echoing a framework's internal phrasing back to a caller says something
 about this service's plumbing, not about their request.

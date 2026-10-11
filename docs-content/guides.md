@@ -13,9 +13,12 @@ Each guide answers one task, end to end. They are grouped by the job you have,
 not by the endpoint you would call. One endpoint does the recognition, and
 almost every question is about what to send it and what to do with the answer.
 
-Every fenced example on these pages is executed against the API on every
-commit, with the public sandbox key that is printed in it. An example that
-stopped working would fail the build before it reached you.
+Every request example on these pages is executed against the API on every
+commit. These are the curl, JavaScript and Python tabs, and they use the public
+sandbox key that is printed in them. An example that stopped working would fail
+the build before it reached you. The longer programs in the two integration
+guides are not run by the build. They were run by hand against the API when
+they were written.
 
 ## Read a document
 
@@ -27,6 +30,14 @@ stopped working would fail the build before it reached you.
 - [Recognize a driver licence](/guides/recognize-a-driver-licence) – the
   barcode and the visual zone, for the issuers that print no machine-readable
   zone at all.
+
+## Build it into an app
+
+- [Read a passport in an Ionic app](/guides/read-a-passport-in-an-ionic-app) –
+  take the photo with Capacitor and show the fields. The key stays on your own
+  server, never on the phone.
+- [Crop a document with OpenCV](/guides/crop-with-opencv) – find the
+  document's outline in Python, straighten it, then send it.
 
 ## Read the answer
 
@@ -57,6 +68,8 @@ stopped working would fail the build before it reached you.
   cover and when they reset.
 - [Use the MCP server](/guides/use-the-mcp-server) – give an assistant the
   recognition tools.
+- [Use the AI SDK](/guides/use-the-ai-sdk) – give a model you build with the
+  AI SDK the recognition tools as a package.
 
 If you are here before your first call, start with
 [your first recognition](/start/first-recognition) instead. If you want the

@@ -18,6 +18,10 @@ One of three things: no `Authorization` header, a header that is not
 `Bearer <key>`, or a key this service does not know. A revoked key is an unknown
 key.
 
+The same holds for a client token: one this service never issued, or one whose
+issuing key was revoked or deleted, is an unknown credential. A token that is
+merely expired or used up has codes of its own.
+
 Which of the three it was is not distinguished in the code. Telling an
 unauthenticated caller whether a key exists is telling them something about
 somebody else's account.
@@ -29,6 +33,7 @@ The wording depends on which of the cases above it was.
 ```text
 Send your API key as `Authorization: Bearer <key>`.
 Unknown API key.
+Unknown client token.
 ```
 
 ## The fix
@@ -46,6 +51,8 @@ and writes one log line.
 ## Related codes
 
 - [`registration_required`](/errors/registration_required) – the anonymous allowance is spent.
+- [`client_token_expired`](/errors/client_token_expired) – a client token past its expiry.
+- [`client_token_used_up`](/errors/client_token_used_up) – a client token with no uses left.
 - [`impersonation_read_only`](/errors/impersonation_read_only) – an administrator's view may only read.
 
 The whole catalogue, grouped by what a caller does with it, is on

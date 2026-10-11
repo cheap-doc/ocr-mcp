@@ -23,6 +23,14 @@ starts billing.
 | Registered | `sk_live_…` | 100 free credits every month, once the email address is confirmed | 1 credit each |
 | Topped up | `sk_live_…` | The month's free credits, then the paid credits bought | 1 credit each |
 
+Every scan made on the public sandbox key is kept for one year for the
+service's own log. The record holds a thumbnail and the address the scan came
+from. It cannot
+be read back through the API, and `retain_hours` does not change it ([the
+public sandbox
+key](/concepts/data-retention-and-privacy#the-public-sandbox-key-keeps-every-scan-for-a-year)).
+Try it with a test image, never a real document.
+
 One credit is one US cent, so the balance is also the number of documents left
 in it. Free credits are drawn first, and paid credits once the month's free
 credits are used up. The rule that decides whether a given call draws a credit is on

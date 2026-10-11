@@ -11,6 +11,38 @@ section: Changelog
 Dated, public record of changes to the API and its documentation. The most
 recent change is first.
 
+## 2026-10-09 – 1.69.1, the public sandbox key keeps its scans for a year
+
+The documentation now says what the public sandbox key, `sk_sandbox_public`,
+does with a scan. Every scan made on it is kept for one year, with no account,
+the address it came from, the reading and a micro thumbnail, and
+`retain_hours` is not applied on that key. The key cannot read, list or delete
+those scans, and the retention sweep deletes them when the year is up. An
+earlier page said they were never stored, which was wrong.
+[Data retention and
+privacy](/concepts/data-retention-and-privacy#the-public-sandbox-key-keeps-every-scan-for-a-year)
+has the details. An account's own sandbox key still stores nothing.
+
+## 2026-10-04 – 1.63.0, client tokens: scan from an app without the key
+
+[`POST /v1/client-tokens`](/reference/endpoints/create-a-client-token) issues
+a short-lived token with an API key. A browser or a mobile app sends
+`POST /v1/scans` with that token, so the key stays on your server. A token
+lives 300 seconds and allows one scan request by default, up to 900 seconds and
+10 requests. It can call nothing but `POST /v1/scans`, its scans are billed and
+stored exactly as the issuing key's, a sandbox key issues sandbox tokens, and
+revoking or deleting the key ends its tokens.
+
+Three error codes come with it: 401
+[`client_token_expired`](/errors/client_token_expired), 401
+[`client_token_used_up`](/errors/client_token_used_up) and 403
+[`client_token_not_allowed`](/errors/client_token_not_allowed).
+[Read a passport in an Ionic app](/guides/read-a-passport-in-an-ionic-app)
+gains a second option built on it.
+
+A `POST` sent with no body at all is now refused with 400
+[`invalid_request`](/errors/invalid_request) instead of 500 `internal_error`.
+
 ## 2026-09-29 – 1.47.0, the history pages and a scan can be deleted
 
 `GET /v1/scans` now answers a page at a time. `limit` sets the page size, from

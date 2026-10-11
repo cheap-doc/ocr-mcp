@@ -190,7 +190,7 @@ Two codes say the service cannot run your scan right now, and both carry
   needed is unreachable.
 
 Requeue the job rather than failing it to your user. The decision table over
-all 21 codes is on [handle errors](/guides/handle-errors).
+all 24 codes is on [handle errors](/guides/handle-errors).
 
 ## Next
 

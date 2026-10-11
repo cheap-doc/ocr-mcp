@@ -28,11 +28,11 @@ Every error response carries one shape, whatever went wrong.
 |---|---|
 | `code` | A stable, machine-readable string. Branch on this, not on the HTTP status alone |
 | `message` | A human-readable explanation. Safe to log, not meant to be parsed |
-| `docs_url` | The page for this code, which is one of the 21 below |
+| `docs_url` | The page for this code, which is one of the 24 below |
 | `request_id` | `req_` and a UUID. Quote it in support: it identifies the exact request in the logs |
 | `event_id` | Set only for a failure the service recorded as something to look at |
 
-Twenty-one codes exist, and every one of them has a page. A code raised only on
+Twenty-four codes exist, and every one of them has a page. A code raised only on
 an internal surface still reaches a caller's logs through support. A `docs_url`
 that answers 404 is worse than a short page.
 
@@ -43,7 +43,7 @@ decided per code rather than per request.
 
 | `event_id` | Meaning | Codes |
 |---|---|---|
-| Always `null` | A refusal the caller is meant to handle. The service answers and writes one log line; nothing is recorded as a failure | 17 of the 21 |
+| Always `null` | A refusal the caller is meant to handle. The service answers and writes one log line; nothing is recorded as a failure | 20 of the 24 |
 | Present on the first of a window | A dependency is away. Worth recording, but not once per request: an afternoon of downtime would cost more events than a month's quota holds | `engine_unavailable`, `service_unavailable`, `rate_unavailable` |
 | Always present | The service did something it did not intend | `internal_error` |
 
@@ -52,15 +52,18 @@ than a timestamp and a guess.
 
 ## The codes you handle
 
-These 17 are the API working. Each is a refusal with a reason, and each carries
+These 20 are the API working. Each is a refusal with a reason, and each carries
 `event_id: null`.
 
 | HTTP | Code | Raised when |
 |---|---|---|
 | 400 | [`invalid_request`](/errors/invalid_request) | The request could not be read at all |
-| 401 | [`unauthorized`](/errors/unauthorized) | No usable API key |
+| 401 | [`unauthorized`](/errors/unauthorized) | No usable API key or client token |
+| 401 | [`client_token_expired`](/errors/client_token_expired) | A client token past its expiry |
+| 401 | [`client_token_used_up`](/errors/client_token_used_up) | A client token with no uses left |
 | 402 | [`insufficient_credits`](/errors/insufficient_credits) | This month's free credits and the paid credits are both used up |
 | 403 | [`registration_required`](/errors/registration_required) | The anonymous free allowance is spent |
+| 403 | [`client_token_not_allowed`](/errors/client_token_not_allowed) | A client token sent anywhere but `POST /v1/scans` |
 | 404 | [`not_found`](/errors/not_found) | No scan with that id, or no such route |
 | 409 | [`idempotency_conflict`](/errors/idempotency_conflict) | The key was used with a different body |
 | 409 | [`idempotency_in_progress`](/errors/idempotency_in_progress) | The first request under the key is still running |
@@ -112,8 +115,8 @@ path.
 
 ## Branching on the code
 
-The HTTP status groups the codes; it does not identify them. Four codes share
-409 and two share 429, and what to do differs inside each group.
+The HTTP status groups the codes; it does not identify them. Three codes share
+401, four share 409 and two share 429, and what to do differs inside each group.
 
 - Branch on `code`. It is stable, and a new code is a change to the contract.
 - Read `message` for a human, and do not parse it. The wording of a

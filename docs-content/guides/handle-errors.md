@@ -101,7 +101,7 @@ in both branches: an error body is JSON and carries the code you need.
 
 ## What to do with each code
 
-The contract carries 21 codes, and every one of them has a page. Two are
+The contract carries 24 codes, and every one of them has a page. Two are
 unreachable with an API key, and are listed so that a `docs_url` never points
 at nothing.
 
@@ -110,6 +110,9 @@ at nothing.
 | [`invalid_request`](/errors/invalid_request) | 400 | Fix the request. Retrying it unchanged fails again |
 | [`validation_failed`](/errors/validation_failed) | 422 | Fix the field the message names. Retrying it unchanged fails again |
 | [`unauthorized`](/errors/unauthorized) | 401 | Fix the key or the header. Stop until it is fixed |
+| [`client_token_expired`](/errors/client_token_expired) | 401 | Ask your server for a new client token, then retry |
+| [`client_token_used_up`](/errors/client_token_used_up) | 401 | Ask your server for a new client token, then retry |
+| [`client_token_not_allowed`](/errors/client_token_not_allowed) | 403 | Call this endpoint with the API key. A client token can only scan |
 | [`registration_required`](/errors/registration_required) | 403 | Register and use your own key. Waiting does not refill the allowance |
 | [`insufficient_credits`](/errors/insufficient_credits) | 402 | Top up, then retry. Nothing was charged and the engine never ran |
 | [`not_found`](/errors/not_found) | 404 | Stop. No such scan, or its retention window has passed |
@@ -150,13 +153,13 @@ tell whether the first call landed. The key is what makes the answer safe.
 ## The shape of a handler
 
 Every code in the table falls into one of four buckets, and a handler needs one
-branch per bucket rather than twenty-one.
+branch per bucket rather than twenty-four.
 
 | Bucket | Codes | Branch |
 |---|---|---|
-| Fix the call | `invalid_request`, `validation_failed`, `payload_too_large`, `unsupported_media_type` | Log the message, fail the operation, do not retry |
+| Fix the call | `invalid_request`, `validation_failed`, `payload_too_large`, `unsupported_media_type`, `client_token_not_allowed` | Log the message, fail the operation, do not retry |
 | Fix the account | `unauthorized`, `registration_required`, `insufficient_credits` | Alert an operator; retry only after somebody acts |
-| Wait and retry | `rate_limited`, `document_repeated`, the four 503s, `internal_error` | Back off, honor `Retry-After`, cap the attempts |
+| Wait and retry | `rate_limited`, `document_repeated`, the four 503s, `internal_error`; with a new token, `client_token_expired` and `client_token_used_up` | Back off, honor `Retry-After`, cap the attempts |
 | Arbitrate a replay | the three `idempotency_` codes | Keep the key, or take a new one, per the table above |
 
 `not_found` is outside all four: it is an answer about a scan that is not
@@ -243,6 +246,6 @@ belong in a log.
 
 - [Retry safely with idempotency](/guides/retry-safely-with-idempotency) – the
   three conflict codes, and what each one arbitrates.
-- [The error reference](/reference/errors) – all 21 codes with their causes.
+- [The error reference](/reference/errors) – all 24 codes with their causes.
 - [HTTP status codes](/reference/http-status-codes) – which codes share a
   status, and why.
